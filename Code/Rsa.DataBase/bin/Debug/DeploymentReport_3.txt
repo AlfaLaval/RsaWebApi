@@ -1,0 +1,23 @@
+﻿** Highlights
+     Tables that will be rebuilt
+       None
+     Clustered indexes that will be dropped
+       None
+     Clustered indexes that will be created
+       None
+     Possible data issues
+       None
+
+** User actions
+     Rename
+       [dbo].[ReportHeaders].[IsSafetyFirstComplete] (Column)
+     Alter
+       [dbo].[ReportHeaders] (Table)
+     Create
+       [dbo].[Observations] (Table)
+       [dbo].[Recommendations] (Table)
+       Default Constraint: unnamed constraint on [dbo].[ReportHeaders] (Default Constraint)
+       [dbo].[FK_Observations_ReportHeaders] (Foreign Key)
+       [dbo].[FK_Recommendations_ReportHeaders] (Foreign Key)
+
+** Supporting actions

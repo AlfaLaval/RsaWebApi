@@ -1,0 +1,34 @@
+﻿using Rsa.Models.DbEntities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Rsa.Services.ViewModels
+{
+    public class HeaderData
+    {
+        public ReportHeader ReportHeader { get; set; }
+        public SafetyFirstCheck SafetyFirstCheck { get; set; }
+    }
+
+    public class ReportAllDetailsVm {
+        public int ReportHeaderId { get; set; }
+        public SafetyFirstCheck SafetyFirstCheck { get; set; }
+        public CustomerEquipmentActivity CustomerEquipmentActivity { get; set; }
+        public VibrationAnalysisHeader VibrationAnalysisHeader { get; set; }
+    }
+
+    public class ResponseData
+    {
+        public ResponseStatus status { get; set; }
+        public string message { get; set; }
+        public object data { get; set; }
+    }
+
+    public enum ResponseStatus
+    {
+        error = -1,
+        warning = 0,
+        success = 1
+    }
+}

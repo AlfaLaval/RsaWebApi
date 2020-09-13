@@ -1,0 +1,31 @@
+﻿** Highlights
+     Tables that will be rebuilt
+       [dbo].[ReportHeaders]
+       [dbo].[SafetyFirstCheckDetails]
+       [dbo].[SafetyFirstChecks]
+     Clustered indexes that will be dropped
+       None
+     Clustered indexes that will be created
+       None
+     Possible data issues
+       None
+
+** User actions
+     Drop
+       unnamed constraint on [dbo].[SafetyFirstCheckDetails] (Default Constraint)
+     Table rebuild
+       [dbo].[ReportHeaders] (Table)
+       [dbo].[SafetyFirstCheckDetails] (Table)
+       [dbo].[SafetyFirstChecks] (Table)
+
+** Supporting actions
+     Drop
+       [dbo].[FK_ReportHeaders_Users_C] (Foreign Key)
+       [dbo].[FK_ReportHeaders_Users_U] (Foreign Key)
+       [dbo].[FK_SafetyFirstChecks_ReportHeaders] (Foreign Key)
+       [dbo].[FK_SafetyCheckDetails_SafetyFirstChecks] (Foreign Key)
+     Create
+       [dbo].[FK_ReportHeaders_Users_C] (Foreign Key)
+       [dbo].[FK_ReportHeaders_Users_U] (Foreign Key)
+       [dbo].[FK_SafetyFirstChecks_ReportHeaders] (Foreign Key)
+       [dbo].[FK_SafetyCheckDetails_SafetyFirstChecks] (Foreign Key)
