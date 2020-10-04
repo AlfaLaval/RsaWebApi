@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Rsa.Models.DbEntities;
 using Rsa.Services.Abstractions;
@@ -16,14 +17,18 @@ namespace Rsa.Services.Implementations
     {
         private readonly ILogger _logger;
         private readonly RsaContext _rsaContext;
-        private readonly string ImageUploadPath = @"E:\Github\Alfa.Laval.Rsa\ImagesUpload\";
+        private readonly string ImageUploadPath = "";
+        private IConfiguration _configuration;
         public ReportActivities(
             ILogger<ReportActivities> logger,
+            IConfiguration configuration,
            RsaContext rsaContext
             )
         {
             _logger = logger;
+            _configuration = configuration;
             _rsaContext = rsaContext;
+            ImageUploadPath = _configuration.GetValue<string>("ImageSec:ImageUploadPath");
         }
         public async Task<ResponseData> CreateReport(ReportHeader reportHeader, SafetyFirstCheck safetyFirstCheck)
         {
@@ -148,15 +153,18 @@ namespace Rsa.Services.Implementations
             {
                 _logger.LogInformation($"{nameof(SaveImage)} - Called");
 
-                var newGuid = Guid.NewGuid().ToString();
+                var newGuid = Guid.NewGuid();
                 ImageHouse imageHouse = new ImageHouse();
+                imageHouse.Id = 0;
                 imageHouse.ImageFileGuid = newGuid;
                 imageHouse.Entity = imageEntity.Entity;
                 imageHouse.ImageLabel = imageEntity.ImageLabel;
                 imageHouse.ReportHeaderId = imageEntity.ReportHeaderId;
                 imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
                 string filePath = $"{ImageUploadPath}{newGuid}.jpeg";
+                _logger.LogInformation($"Img Saved - Called");
                 File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                _logger.LogInformation($"Img Saved - Completed");
                 _rsaContext.Add(imageHouse);
                 if (await _rsaContext.SaveChangesAsync() > 0)
                 {
@@ -179,7 +187,7 @@ namespace Rsa.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{nameof(SaveImage)} - Error",ex);
+                _logger.LogError(ex, $"{nameof(SaveImage)} - Error");
                 return new ResponseData()
                 {
                     status = ResponseStatus.error,
@@ -240,10 +248,11 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetImages(int reportHeaderId, string entity,Guid EntityRefGuid)
+        public async Task<ResponseData> GetImages(int reportHeaderId, string entity)
         {
             try
             {
+                _logger.LogInformation($"{nameof(GetImages)} - Called");
                 List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
                 var images = await _rsaContext.ImageHouses.AsNoTracking()
                     .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId).ToListAsync();
@@ -252,13 +261,15 @@ namespace Rsa.Services.Implementations
                     vmImageDataList.Add(
                         new VmImageSaveEntity
                         {
-                            Base64 = GetBase64(img.ImageFileGuid),
+                            ImageHouseId = img.Id,
+                            Base64 = GetBase64(img.ImageFileGuid.ToString()),
                             ImageLabel = img.ImageLabel,
                             Entity = img.Entity,
                             EntityRefGuid = img.EntityRefGuid,
                             ReportHeaderId = reportHeaderId
                         });
                 }
+                _logger.LogInformation($"{nameof(GetImages)} - completed");
                 return new ResponseData()
                 {
                     status = ResponseStatus.success,

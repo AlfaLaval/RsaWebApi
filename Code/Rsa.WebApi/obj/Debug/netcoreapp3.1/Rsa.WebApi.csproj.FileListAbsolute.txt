@@ -99,9 +99,6 @@ E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\bin\Debug\netcoreapp3.1\Rsa.Mode
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.csprojAssemblyReference.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.AssemblyInfoInputs.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.AssemblyInfo.cs
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.csproj.CoreCompileInputs.cache
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.MvcApplicationPartsAssemblyInfo.cs
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.MvcApplicationPartsAssemblyInfo.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.RazorTargetAssemblyInfo.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.csproj.CopyComplete
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\staticwebassets\Rsa.WebApi.StaticWebAssets.Manifest.cache
@@ -109,3 +106,10 @@ E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\staticwe
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.dll
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.pdb
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.genruntimeconfig.cache
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\bin\Debug\netcoreapp3.1\NLog.dll
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\bin\Debug\netcoreapp3.1\NLog.Extensions.Logging.dll
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\bin\Debug\netcoreapp3.1\NLog.Web.AspNetCore.dll
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.csproj.CoreCompileInputs.cache
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.MvcApplicationPartsAssemblyInfo.cs
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\obj\Debug\netcoreapp3.1\Rsa.WebApi.MvcApplicationPartsAssemblyInfo.cache
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.WebApi\bin\Debug\netcoreapp3.1\nlog.config

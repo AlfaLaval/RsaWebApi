@@ -232,7 +232,7 @@ namespace Rsa.Models.DbEntities
         public int ReportHeaderId { get; set; }
         public string Entity { get; set; }
 		//public int EntityRefId { get; set; }
-		public string ImageFileGuid { get; set; }
+		public Guid ImageFileGuid { get; set; }
 		public string ImageLabel { get; set; }
 		public Guid EntityRefGuid { get; set; }
 

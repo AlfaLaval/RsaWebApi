@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -147,10 +148,25 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetImages([FromQuery]int reportHeaderId, 
-            [FromQuery] string entity, [FromQuery] Guid entityRefGuid)
+            [FromQuery] string entity)
         {
-            var result = await _reportActivities.GetImages(reportHeaderId,entity,entityRefGuid);
+            var result = await _reportActivities.GetImages(reportHeaderId,entity);
             return Ok(result);
         }
+
+        //[Authorize]
+        //[HttpGet]
+        //[Route("secret")]
+        //public async Task<ActionResult> Secret()
+        //{
+        //    return Ok("From Secret");
+        //}
+
+        //[HttpGet]
+        //[Route("authenticate")]
+        //public async Task<ActionResult> Authenticate() {
+        //    return Ok("Authenticate");
+        //}
+
     }
 }

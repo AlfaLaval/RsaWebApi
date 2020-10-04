@@ -1,6 +1,9 @@
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\bin\Debug\Rsa.DataBase.dacpac
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\bin\Debug\Rsa.DataBase.dll
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\bin\Debug\Rsa.DataBase.pdb
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\Rsa.DataBase.sqlprojAssemblyReference.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\Rsa.DataBase.dll
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\Rsa.DataBase.pdb
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\Model.xml
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\refactor.xml
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\postdeploy.sql
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.DataBase\obj\Debug\predeploy.sql

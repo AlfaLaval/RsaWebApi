@@ -13,7 +13,7 @@ namespace Rsa.Services.Abstractions
         Task<ResponseData> GetReportDetails(int reportHeaderId);
         Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity);
         Task<ResponseData> DeleteImageById(int imageHouseId);
-        Task<ResponseData> GetImages(int reportHeaderId, string entity, Guid EntityRefGuid);
+        Task<ResponseData> GetImages(int reportHeaderId, string entity);
 
     }
 }

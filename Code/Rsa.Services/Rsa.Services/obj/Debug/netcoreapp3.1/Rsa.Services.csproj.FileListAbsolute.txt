@@ -6,7 +6,7 @@ E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\bin\Debug\netcore
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.csprojAssemblyReference.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.AssemblyInfoInputs.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.AssemblyInfo.cs
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.csproj.CoreCompileInputs.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.csproj.CopyComplete
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.dll
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.pdb
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Services\Rsa.Services\obj\Debug\netcoreapp3.1\Rsa.Services.csproj.CoreCompileInputs.cache

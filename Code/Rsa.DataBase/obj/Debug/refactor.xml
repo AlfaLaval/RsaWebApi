@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0">
+  <Operation Name="Rename Refactor" Key="0cc9ab51-4ff0-4488-90ac-01f7fe14df7e" ChangeDateTime="09/10/2020 02:47:20" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[SafetyFirstChecks].[UpdatedBY]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SafetyFirstChecks]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UpdatedBy" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7a34ed14-b9c6-4c4c-8bf8-7edaa45683ab" ChangeDateTime="09/12/2020 10:25:24" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[Users].[Email]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Users]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="65ae5787-0204-4273-aafb-aa1a0b4e0156" ChangeDateTime="09/12/2020 10:25:38" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[Users].[UserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Users]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="92a55be8-a737-4770-8502-1e00481ae832" ChangeDateTime="09/12/2020 14:44:05" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[CustomerEquipmentActivities].[PreviousStartDate]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CustomerEquipmentActivities]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PreviousServiceDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8fb8933d-960e-4af9-831f-b07d796c39c8" ChangeDateTime="09/12/2020 14:46:17" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[CustomerEquipmentActivities].[Decanter]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CustomerEquipmentActivities]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DecanterSerialumber" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c66ef1b1-e977-4c9c-85d8-4113530d68a6" ChangeDateTime="09/12/2020 14:46:29" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[CustomerEquipmentActivities].[DecanterSerialumber]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CustomerEquipmentActivities]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DecanterSerialNumber" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="58ccc9e6-0a27-499f-affc-b3cd145b898f" ChangeDateTime="09/13/2020 05:17:38" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[VibrationAnalysis].[As]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VibrationAnalysis]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AsDryRun" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4778181c-0ee7-4ad1-b193-bcfa02915b55" ChangeDateTime="09/13/2020 05:18:13" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[VibrationAnalysis].[As]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VibrationAnalysis]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AsProduction" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="442eb057-0842-4067-80dc-67401e4abfcb" ChangeDateTime="09/13/2020 09:39:17" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[VibrationAnalysis].[VibrantAnalysisHeaderId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VibrationAnalysis]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VibrationAnalysisHeaderId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1ecdfd58-6afc-4a86-a88c-0430dfa3eb7a" ChangeDateTime="09/13/2020 09:40:05" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[VibrationAnalysisHeaders].[Remarls]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VibrationAnalysisHeaders]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Remarks" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7b3c6bfa-ae5d-43c9-b6df-a4150584f70b" ChangeDateTime="09/13/2020 11:15:11" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[ReportHeaders].[IsSaveComplete]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ReportHeaders]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSafetyFirstComplete" />
+  </Operation>
+</Operations>

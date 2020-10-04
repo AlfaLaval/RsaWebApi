@@ -4,6 +4,6 @@ E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\bin\Debug\netstandard2.0\Rsa.Mod
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.csprojAssemblyReference.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.AssemblyInfoInputs.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.AssemblyInfo.cs
-E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.csproj.CoreCompileInputs.cache
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.dll
 E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.pdb
+E:\Github\Alfa.Laval.Rsa\WebApi\Code\Rsa.Models\obj\Debug\netstandard2.0\Rsa.Models.csproj.CoreCompileInputs.cache
