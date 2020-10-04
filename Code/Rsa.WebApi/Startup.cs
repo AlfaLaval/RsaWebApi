@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using Rsa.Services;
 
 namespace Rsa.WebApi
@@ -22,7 +23,10 @@ namespace Rsa.WebApi
         {
             services.AddControllers()
             .AddNewtonsoftJson(options =>
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                { 
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                });
 
             services.AddDbContext<RsaContext>(options =>
             {
@@ -30,6 +34,12 @@ namespace Rsa.WebApi
             });
 
             services.AddBusinessServices();
+            services.AddCors(o => o.AddPolicy("RsaApiCorsPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
             services.AddSwaggerGen();
         }
 
@@ -42,14 +52,14 @@ namespace Rsa.WebApi
             }
 
             #region Swagger
-
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rsa Web Api");
-            }); 
+            });
             #endregion
+
+            app.UseCors("RsaApiCorsPolicy");
 
             app.UseRouting();
 

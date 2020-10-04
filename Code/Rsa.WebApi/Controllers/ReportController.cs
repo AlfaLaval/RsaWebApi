@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Rsa.Models.DbEntities;
 using Rsa.Services.Abstractions;
 using Rsa.Services.ViewModels;
 
 namespace Rsa.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/report")]
     [ApiController]
     public class ReportController : ControllerBase
     {
@@ -32,9 +29,7 @@ namespace Rsa.WebApi.Controllers
         public async Task<ActionResult> RegisterSafetyFirstCheck([FromBody] HeaderData headerData)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             try
             {
@@ -49,7 +44,6 @@ namespace Rsa.WebApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     new { data = "Error occurred, Please contact admin"});
             }
-
         }
 
         [HttpPost]
@@ -75,6 +69,88 @@ namespace Rsa.WebApi.Controllers
                     new { data = "Error occurred. Please contact admin" });
             }
 
+        }
+
+        [HttpGet]
+        [Consumes("application/json")]
+        [Route("getreports")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetReports()
+        {
+            try
+            {
+                var res = await _reportActivities.GetReports();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(GetReports)} - Error", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { data = "Error occurred. Please contact admin" });
+            }
+
+        }
+
+        [HttpGet]
+        [Consumes("application/json")]
+        [Route("getreportdetails")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetReportDetails([FromQuery]int reportHeaderId)
+        {
+            try
+            {
+                if (!(reportHeaderId > 0))
+                    return BadRequest();
+
+                var res = await _reportActivities.GetReportDetails(reportHeaderId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(GetReportDetails)} - Error", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { data = "Error occurred. Please contact admin" });
+            }
+
+        }
+
+        
+        [HttpPost]
+        [Route("saveimage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> SaveImage(VmImageSaveEntity imageData)
+        {
+            var result = await _reportActivities.SaveImage(imageData);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("deleteimagebyid")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteImageById([FromBody]int imageHouseId)
+        {
+            var result = await _reportActivities.DeleteImageById(imageHouseId);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("getimages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetImages([FromQuery]int reportHeaderId, 
+            [FromQuery] string entity, [FromQuery] Guid entityRefGuid)
+        {
+            var result = await _reportActivities.GetImages(reportHeaderId,entity,entityRefGuid);
+            return Ok(result);
         }
     }
 }

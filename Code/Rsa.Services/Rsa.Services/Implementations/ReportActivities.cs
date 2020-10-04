@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Internal;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Rsa.Models.DbEntities;
 using Rsa.Services.Abstractions;
 using Rsa.Services.ViewModels;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +16,7 @@ namespace Rsa.Services.Implementations
     {
         private readonly ILogger _logger;
         private readonly RsaContext _rsaContext;
+        private readonly string ImageUploadPath = @"E:\Github\Alfa.Laval.Rsa\ImagesUpload\";
         public ReportActivities(
             ILogger<ReportActivities> logger,
            RsaContext rsaContext
@@ -28,6 +32,7 @@ namespace Rsa.Services.Implementations
                 _logger.LogInformation("Create Report Called");
 
                 reportHeader.CreatedOn = DateTime.UtcNow;
+                reportHeader.CreatedBy = 1;
                 reportHeader.IsSafetyFirstComplete = false;
                 reportHeader.IsCustomerEquipmentComplete = false;
                 reportHeader.IsVibrationAnalysisComplete = false;
@@ -46,12 +51,245 @@ namespace Rsa.Services.Implementations
 
                 _logger.LogInformation("Create Report Completed");
 
-                return new ResponseData() { status = ResponseStatus.success, message = "Report Created Successfully." };
+                return new ResponseData()
+                {
+                    status = ResponseStatus.success,
+                    data = new { reportHeader, safetyFirstCheck },
+                    message = "Report Created Successfully."
+                };
             }
             catch (System.Exception ex)
             {
                 _logger.LogError($"{nameof(CreateReport)} - Error", ex);
                 return new ResponseData() { status = ResponseStatus.error, message = "Report Creation Failed." };
+            }
+        }
+
+        public async Task<ResponseData> GetReportDetails(int reportHeaderId)
+        {
+            ReportAllDetailsVm reportAllDetailsVm = new ReportAllDetailsVm();
+            reportAllDetailsVm.ReportHeaderId = reportHeaderId;
+            reportAllDetailsVm.SafetyFirstCheck = _rsaContext.SafetyFirstChecks.AsNoTracking()
+                .Include(a=>a.SafetyFirstCheckDetails)
+                .Where(w => w.ReportHeaderId == reportHeaderId).FirstOrDefault();
+
+            if (reportAllDetailsVm.SafetyFirstCheck == null)
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = "Error while getting data."
+                };
+
+            reportAllDetailsVm.CustomerEquipmentActivity = _rsaContext.CustomerEquipmentActivities.AsNoTracking()
+                .Where(w => w.ReportHeaderId == reportHeaderId).FirstOrDefault();
+
+            if(reportAllDetailsVm.CustomerEquipmentActivity == null)
+            {
+                reportAllDetailsVm.CustomerEquipmentActivity = new CustomerEquipmentActivity()
+                {
+                    ReportHeaderId = reportHeaderId
+                };
+            }
+            reportAllDetailsVm.VibrationAnalysisHeader = _rsaContext.VibrationAnalysisHeaders.AsNoTracking()
+                .Include(a => a.VibrationAnalysis)
+                .Where(w => w.ReportHeaderId == reportHeaderId)
+                .FirstOrDefault();
+
+            if (reportAllDetailsVm.VibrationAnalysisHeader == null)
+            {
+                reportAllDetailsVm.VibrationAnalysisHeader = new VibrationAnalysisHeader()
+                {
+                    ReportHeaderId = reportHeaderId
+                };
+            }
+            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+            if (obs == null)
+                obs = new List<Observation>();
+            reportAllDetailsVm.Observations = obs;
+
+            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+            if (recomms == null)
+                recomms = new List<Recommendation>();
+            reportAllDetailsVm.Recommendations = recomms;
+
+            return new ResponseData()
+            {
+                status = ResponseStatus.success,
+                data = reportAllDetailsVm
+            };
+
+        }
+
+        public async Task<ResponseData> GetReports()
+        {
+            var reports = _rsaContext.ReportHeaders.AsNoTracking()
+                .Join(_rsaContext.SafetyFirstChecks.AsNoTracking(), rh => rh.Id, sfc => sfc.ReportHeaderId,
+                    (rh, sfc) => new { rh, sfc })
+                .Select(s => new
+                {
+                    s.rh.Id,
+                    s.rh.CreatedBy,
+                    s.rh.CreatedOn,
+                    s.sfc.JobOrderNumber,
+                    s.sfc.ProjectName
+                }).OrderByDescending(o=>o.CreatedOn);
+
+            var data = await reports.ToListAsync();
+            return new ResponseData()
+            {
+                status = ResponseStatus.success,
+                data = data
+            };
+        }
+
+        public async Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(SaveImage)} - Called");
+
+                var newGuid = Guid.NewGuid().ToString();
+                ImageHouse imageHouse = new ImageHouse();
+                imageHouse.ImageFileGuid = newGuid;
+                imageHouse.Entity = imageEntity.Entity;
+                imageHouse.ImageLabel = imageEntity.ImageLabel;
+                imageHouse.ReportHeaderId = imageEntity.ReportHeaderId;
+                imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
+                string filePath = $"{ImageUploadPath}{newGuid}.jpeg";
+                File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                _rsaContext.Add(imageHouse);
+                if (await _rsaContext.SaveChangesAsync() > 0)
+                {
+                    //MyImage.ResizeJPEG(filePath);
+                    _logger.LogInformation($"{nameof(SaveImage)} - Completed");
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.success,
+                        data = imageHouse.Id,
+                        message = "Image Saved Successfully."
+                    };
+                }
+                
+                return new ResponseData()
+                {
+                    status = ResponseStatus.warning,
+                    data = 1,
+                    message = "Try again after some time."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(SaveImage)} - Error",ex);
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = "Error occurred while saving image. Please contact admin."
+                };
+            }
+        }
+
+        public async Task<ResponseData> DeleteImageById(int imageHouseId)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(DeleteImageById)} - Called");
+                if (imageHouseId <= 0)
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "Image is not valid"
+                    };
+
+                var image = _rsaContext.ImageHouses.Find(imageHouseId);
+
+                if (image == null)
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "Image is not valid"
+                    };
+
+                _rsaContext.Remove(image);
+
+                if (await _rsaContext.SaveChangesAsync() > 0)
+                {
+
+                    File.Delete($"{ImageUploadPath}{image.ImageFileGuid}.jpeg");
+                    _logger.LogInformation($"{nameof(DeleteImageById)} - Completed");
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.success,
+                        message = "Image deleted successfully."
+                    };
+                }
+
+                return new ResponseData()
+                {
+                    status = ResponseStatus.warning,
+                    message = "Image is not valid"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in {nameof(DeleteImageById)}");
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = "Error occurred. Please contact admin"
+                };
+            }
+        }
+
+        public async Task<ResponseData> GetImages(int reportHeaderId, string entity,Guid EntityRefGuid)
+        {
+            try
+            {
+                List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
+                var images = await _rsaContext.ImageHouses.AsNoTracking()
+                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId).ToListAsync();
+                foreach (var img in images)
+                {
+                    vmImageDataList.Add(
+                        new VmImageSaveEntity
+                        {
+                            Base64 = GetBase64(img.ImageFileGuid),
+                            ImageLabel = img.ImageLabel,
+                            Entity = img.Entity,
+                            EntityRefGuid = img.EntityRefGuid,
+                            ReportHeaderId = reportHeaderId
+                        });
+                }
+                return new ResponseData()
+                {
+                    status = ResponseStatus.success,
+                    data = vmImageDataList
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(GetImages)} - Error.", ex);
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = ex.Message
+                };
+            }
+        }
+
+        private string GetBase64(string guid)
+        {
+            try
+            {
+                string filePath = $"{ImageUploadPath}{guid}.jpeg";
+                var fileBytes = File.ReadAllBytes(filePath);
+
+                string encodedFile = Convert.ToBase64String(fileBytes);
+
+                return "data:image/jpeg;base64," + encodedFile;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -137,6 +375,23 @@ namespace Rsa.Services.Implementations
                 else {
                     reportAllDetails.VibrationAnalysisHeader.ReportHeaderId = reportHeaderId;
                     _rsaContext.Update(reportAllDetails.VibrationAnalysisHeader);
+                }
+
+                foreach(var obs in reportAllDetails.Observations)
+                {
+                    obs.ReportHeaderId = reportHeaderId;
+                    if (obs.Id == 0)
+                        _rsaContext.Add(obs);
+                    else
+                        _rsaContext.Update(obs);
+                }
+                foreach (var recomm in reportAllDetails.Recommendations)
+                {
+                    recomm.ReportHeaderId = reportHeaderId;
+                    if (recomm.Id == 0)
+                        _rsaContext.Add(recomm);
+                    else
+                        _rsaContext.Update(recomm);
                 }
 
                 await _rsaContext.SaveChangesAsync();

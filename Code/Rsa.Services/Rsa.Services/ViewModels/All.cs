@@ -16,6 +16,8 @@ namespace Rsa.Services.ViewModels
         public SafetyFirstCheck SafetyFirstCheck { get; set; }
         public CustomerEquipmentActivity CustomerEquipmentActivity { get; set; }
         public VibrationAnalysisHeader VibrationAnalysisHeader { get; set; }
+        public List<Observation> Observations { get; set; }
+        public List<Recommendation> Recommendations { get; set; }
     }
 
     public class ResponseData
@@ -30,5 +32,15 @@ namespace Rsa.Services.ViewModels
         error = -1,
         warning = 0,
         success = 1
+    }
+
+    public class VmImageSaveEntity
+    {
+        public string Base64 { get; set; }
+        public string Entity { get; set; }
+        public Guid EntityRefGuid { get; set; }
+        public int ReportHeaderId { get; set; }
+        public string ImageLabel { get; set; }
+
     }
 }

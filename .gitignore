@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Code/Rsa.Models/bin/Release/netstandard2.0
+/Code/Rsa.Models/obj/Release/netstandard2.0
+/Code/Rsa.Services/Rsa.Services/obj/Release/netcoreapp3.1
+/Code/Rsa.WebApi/bin/Release/netcoreapp3.1
+/Code/Rsa.WebApi/obj/Release/netcoreapp3.1
+/Code/Rsa.WebApi/Properties/PublishProfiles
+/Code/Rsa.DataBase/bin/Debug/Rsa.DataBase*
+/Code/Rsa.DataBase/bin/Debug/DeploymentReport*

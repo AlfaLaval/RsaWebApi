@@ -63,7 +63,7 @@ namespace Rsa.Models.DbEntities
 		public string JobOrderNumber { get; set; }
 		[Required]
 		[MaxLength(50)]
-		public string ContactNUmber { get; set; }
+		public string ContactNumber { get; set; }
         public IList<SafetyFirstCheckDetail> SafetyFirstCheckDetails { get; set; }
     }
 
@@ -162,7 +162,7 @@ namespace Rsa.Models.DbEntities
 		public bool AsProduction { get; set; }
 		public int ReportHeaderId { get; set; }
 		public string Remarks { get; set; }
-        public VibrationAnalysis VibrationAnalysis { get; set; }
+        public IList<VibrationAnalysis> VibrationAnalysis { get; set; }
     }
 
 	public class VibrationAnalysis
@@ -200,8 +200,12 @@ namespace Rsa.Models.DbEntities
 
 		[MaxLength(100)]
 		public string Remarks { get; set; }
+        public bool ImmediateAction { get; set; }
+		public bool MidTermAction { get; set; }
+		public bool Observation { get; set; }
 		public int ReportHeaderId { get; set; }
-	}
+        public Guid EntityRefGuid { get; set; }
+    }
 
 	public class Observation
 	{
@@ -218,5 +222,19 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(100)]
 		public string ActionTaken { get; set; }
 		public int ReportHeaderId { get; set; }
+		public Guid EntityRefGuid { get; set; }
+	}
+
+	public class ImageHouse
+	{
+		[Key]
+		public int Id { get; set; }
+        public int ReportHeaderId { get; set; }
+        public string Entity { get; set; }
+		//public int EntityRefId { get; set; }
+		public string ImageFileGuid { get; set; }
+		public string ImageLabel { get; set; }
+		public Guid EntityRefGuid { get; set; }
+
 	}
 }

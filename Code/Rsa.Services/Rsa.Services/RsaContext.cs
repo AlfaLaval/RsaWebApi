@@ -14,5 +14,8 @@ namespace Rsa.Services
         public DbSet<CustomerEquipmentActivity> CustomerEquipmentActivities { get; set; }
         public DbSet<VibrationAnalysisHeader> VibrationAnalysisHeaders { get; set; }
         public DbSet<VibrationAnalysis> VibrationAnalysis { get; set; }
+        public DbSet<Observation> Observations { get; set; }
+        public DbSet<Recommendation> Recommendations { get; set; }
+        public DbSet<ImageHouse> ImageHouses { get; set; }
     }
 }

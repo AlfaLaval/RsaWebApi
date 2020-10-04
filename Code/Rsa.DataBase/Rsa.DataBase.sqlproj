@@ -69,6 +69,7 @@
     <Build Include="Tables\VibrationAnalysisHeaders.sql" />
     <Build Include="Tables\Observations.sql" />
     <Build Include="Tables\Recommendations.sql" />
+    <Build Include="Tables\ImageHouses.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rsa.DataBase.refactorlog" />
