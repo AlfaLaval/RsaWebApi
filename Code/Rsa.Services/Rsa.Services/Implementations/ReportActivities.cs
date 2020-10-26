@@ -43,6 +43,7 @@ namespace Rsa.Services.Implementations
                 reportHeader.IsVibrationAnalysisComplete = false;
                 reportHeader.IsObservationComplete = false;
                 reportHeader.IsRecommendationComplete = false;
+                reportHeader.ApprovedBy = null;
 
                 _rsaContext.Add(reportHeader);
                 if (_rsaContext.SaveChanges() > 0)
@@ -107,15 +108,21 @@ namespace Rsa.Services.Implementations
                     ReportHeaderId = reportHeaderId
                 };
             }
-            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status =='A').ToList();
             if (obs == null)
                 obs = new List<Observation>();
             reportAllDetailsVm.Observations = obs;
 
-            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
             if (recomms == null)
                 recomms = new List<Recommendation>();
             reportAllDetailsVm.Recommendations = recomms;
+
+            reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc();
+
+            var signImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId);
+            if (signImage != null)
+                reportAllDetailsVm.SignatureImageId = signImage.Id;
 
             return new ResponseData()
             {
@@ -155,7 +162,7 @@ namespace Rsa.Services.Implementations
 
                 var newGuid = Guid.NewGuid();
                 ImageHouse imageHouse = new ImageHouse();
-                imageHouse.Id = 0;
+                imageHouse.Id = imageEntity.ImageHouseId;
                 imageHouse.ImageFileGuid = newGuid;
                 imageHouse.Entity = imageEntity.Entity;
                 imageHouse.ImageLabel = imageEntity.ImageLabel;
@@ -163,9 +170,19 @@ namespace Rsa.Services.Implementations
                 imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
                 string filePath = $"{ImageUploadPath}{newGuid}.jpeg";
                 _logger.LogInformation($"Img Saved - Called");
-                File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                if ("signature".Equals(imageEntity.Entity))
+                {
+                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
+                    filePath = $"{ImageUploadPath}{newGuid}.png";
+                }
+                else
+                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                
                 _logger.LogInformation($"Img Saved - Completed");
-                _rsaContext.Add(imageHouse);
+                if (imageHouse.Id == 0)
+                    _rsaContext.Add(imageHouse);
+                else
+                    _rsaContext.Update(imageHouse);
                 if (await _rsaContext.SaveChangesAsync() > 0)
                 {
                     //MyImage.ResizeJPEG(filePath);
@@ -248,14 +265,16 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetImages(int reportHeaderId, string entity)
+        public async Task<ResponseData> GetImages(int reportHeaderId, string entity,Guid entityRefGuid)
         {
             try
             {
                 _logger.LogInformation($"{nameof(GetImages)} - Called");
                 List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
                 var images = await _rsaContext.ImageHouses.AsNoTracking()
-                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId).ToListAsync();
+                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId
+                    && w.EntityRefGuid == entityRefGuid)
+                    .ToListAsync();
                 foreach (var img in images)
                 {
                     vmImageDataList.Add(
@@ -405,6 +424,18 @@ namespace Rsa.Services.Implementations
                         _rsaContext.Update(recomm);
                 }
 
+
+                if (reportAllDetails.Misc.Id == 0)
+                {
+                    reportAllDetails.Misc.ReportHeaderId = reportHeaderId;
+                    _rsaContext.Add(reportAllDetails.Misc);
+                }
+                else
+                {
+                    reportAllDetails.Misc.ReportHeaderId = reportHeaderId;
+                    _rsaContext.Update(reportAllDetails.Misc);
+                }
+
                 await _rsaContext.SaveChangesAsync();
 
 
@@ -416,6 +447,64 @@ namespace Rsa.Services.Implementations
                 return new ResponseData() { status = ResponseStatus.error, data = reportHeaderId, message = "Report Save Failed." };
             }
 
+        }
+
+        public async Task<ResponseData> SendToSuperVisor(int reportHeaderId)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(SendToSuperVisor)} - Called");
+
+                var data = _rsaContext.ReportHeaders.Find(reportHeaderId);
+                if (!data.IsDocTrigger)
+                {
+                    data.IsDocTrigger = true;
+                }
+                await _rsaContext.SaveChangesAsync();
+
+                _logger.LogInformation($"{nameof(SendToSuperVisor)} - completed");
+                return new ResponseData()
+                {
+                    status = ResponseStatus.success,
+                    data = reportHeaderId
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(SendToSuperVisor)} - Error.", ex);
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResponseData> GetUserLoginData(string username, string password)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(GetUserLoginData)} - Called");
+
+                var data = await _rsaContext.Users
+                    .Where(w => w.Active).FirstOrDefaultAsync(f => f.UserName.ToLower() == username.ToLower() && f.Password == password);
+         
+                _logger.LogInformation($"{nameof(GetUserLoginData)} - completed");
+                return new ResponseData()
+                {
+                    status = ResponseStatus.success,
+                    data = data
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(GetUserLoginData)} - Error.", ex);
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = ex.Message
+                };
+            }
         }
 
     }

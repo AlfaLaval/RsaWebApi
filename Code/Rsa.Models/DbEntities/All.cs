@@ -20,10 +20,20 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(100)]
 		public string Email { get; set; }
 		public bool Active { get; set; }
-		[Required]
-		public string Role { get; set; }
+		public bool IsSuperVisor { get; set; }
 
-	}
+		public int? SuperVisorId { get; set; }
+
+		public string OTP { get; set; }
+
+		public DateTime? OTPGeneratedOn { get; set; }
+
+		public string Region { get; set; }
+
+		public bool IsSuperUser { get; set; }
+        public string Password { get; set; }
+
+    }
 	public class ReportHeader
 	{
 		[Key]
@@ -38,8 +48,9 @@ namespace Rsa.Models.DbEntities
 		public bool IsVibrationAnalysisComplete { get; set; }
 		public bool IsObservationComplete { get; set; }
         public bool IsRecommendationComplete { get; set; }
-
-    }
+        public bool IsDocTrigger { get; set; }
+		public int? ApprovedBy { get; set; }
+	}
 
 	public class SafetyFirstCheck
 	{
@@ -162,7 +173,19 @@ namespace Rsa.Models.DbEntities
 		public bool AsProduction { get; set; }
 		public int ReportHeaderId { get; set; }
 		public string Remarks { get; set; }
-        public IList<VibrationAnalysis> VibrationAnalysis { get; set; }
+
+        public bool MdMotor { get; set; }
+		public bool BdMotor { get; set; }
+        public string MdDriveEndMain { get; set; }
+		public string MdDriveEndBack { get; set; }
+		public string MdNonDriveEndMain { get; set; }
+		public string MdNonDriveEndBack { get; set; }
+
+		public string BdDriveEndMain { get; set; }
+		public string BdDriveEndBack { get; set; }
+		public string BdNonDriveEndMain { get; set; }
+		public string BdNonDriveEndBack { get; set; }
+		public IList<VibrationAnalysis> VibrationAnalysis { get; set; }
     }
 
 	public class VibrationAnalysis
@@ -205,7 +228,8 @@ namespace Rsa.Models.DbEntities
 		public bool Observation { get; set; }
 		public int ReportHeaderId { get; set; }
         public Guid EntityRefGuid { get; set; }
-    }
+		public char Status { get; set; }
+	}
 
 	public class Observation
 	{
@@ -223,7 +247,8 @@ namespace Rsa.Models.DbEntities
 		public string ActionTaken { get; set; }
 		public int ReportHeaderId { get; set; }
 		public Guid EntityRefGuid { get; set; }
-	}
+        public char Status { get; set; }
+    }
 
 	public class ImageHouse
 	{
@@ -236,5 +261,14 @@ namespace Rsa.Models.DbEntities
 		public string ImageLabel { get; set; }
 		public Guid EntityRefGuid { get; set; }
 
+	}
+
+	public class Misc
+    {
+		[Key]
+        public int Id { get; set; }
+        public int ReportHeaderId { get; set; }
+        public string FirmComments { get; set; }
+		public string CustomerComments { get; set; }
 	}
 }

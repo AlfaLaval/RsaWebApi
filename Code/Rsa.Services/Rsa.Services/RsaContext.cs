@@ -17,5 +17,6 @@ namespace Rsa.Services
         public DbSet<Observation> Observations { get; set; }
         public DbSet<Recommendation> Recommendations { get; set; }
         public DbSet<ImageHouse> ImageHouses { get; set; }
+        public DbSet<Misc> Miscs { get; set; }
     }
 }

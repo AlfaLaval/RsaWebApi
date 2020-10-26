@@ -148,10 +148,14 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetImages([FromQuery]int reportHeaderId, 
-            [FromQuery] string entity)
+            [FromQuery] string entity,[FromQuery] string enityRefGuid)
         {
-            var result = await _reportActivities.GetImages(reportHeaderId,entity);
-            return Ok(result);
+            if (Guid.TryParse(enityRefGuid, out var guid))
+            {
+                var result = await _reportActivities.GetImages(reportHeaderId, entity, guid);
+                return Ok(result);
+            }
+            return BadRequest();
         }
 
         //[Authorize]
@@ -167,6 +171,30 @@ namespace Rsa.WebApi.Controllers
         //public async Task<ActionResult> Authenticate() {
         //    return Ok("Authenticate");
         //}
+
+
+        [Route("sendtosupervisor")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> SendToSuperVisor([FromQuery] int reportHeaderId)
+        {
+            var result = await _reportActivities.SendToSuperVisor(reportHeaderId);
+            return Ok(result);
+        }
+
+
+        [Route("getuserlogindata")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetUserLoginData([FromQuery] string username, [FromQuery] string password)
+        {
+            var result = await _reportActivities.GetUserLoginData(username,password);
+            return Ok(result);
+        }
 
     }
 }

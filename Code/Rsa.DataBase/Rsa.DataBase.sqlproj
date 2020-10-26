@@ -70,6 +70,7 @@
     <Build Include="Tables\Observations.sql" />
     <Build Include="Tables\Recommendations.sql" />
     <Build Include="Tables\ImageHouses.sql" />
+    <Build Include="Tables\Miscs.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rsa.DataBase.refactorlog" />

@@ -9,7 +9,17 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Rsa.DataBase", "Rsa.DataBas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rsa.Models", "Rsa.Models\Rsa.Models.csproj", "{81C93839-2CCD-499B-B0CC-D796A9436859}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsa.Services", "Rsa.Services\Rsa.Services\Rsa.Services.csproj", "{A249D685-082E-4864-98AC-D082B397318F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rsa.Services", "Rsa.Services\Rsa.Services\Rsa.Services.csproj", "{A249D685-082E-4864-98AC-D082B397318F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentGenerate", "DocumentGenerate\DocumentGenerate.csproj", "{95F77169-0E04-4DE7-816D-7ADCDB9A968F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-NetFramework", "2-NetFramework", "{16657521-2EDE-49E2-86E6-17AECD651390}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-NetStandard", "0-NetStandard", "{B28FFECB-BBC0-4A80-9898-31A6D83528F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-NetCore", "3-NetCore", "{B16C40E4-8839-41A1-A201-CC9B9F196B50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4-DbScripts", "4-DbScripts", "{17B7DFA4-76FA-44C1-BB8B-35D181EE4270}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,9 +45,20 @@ Global
 		{A249D685-082E-4864-98AC-D082B397318F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A249D685-082E-4864-98AC-D082B397318F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A249D685-082E-4864-98AC-D082B397318F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F77169-0E04-4DE7-816D-7ADCDB9A968F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F77169-0E04-4DE7-816D-7ADCDB9A968F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F77169-0E04-4DE7-816D-7ADCDB9A968F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F77169-0E04-4DE7-816D-7ADCDB9A968F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB138DC5-4E38-4BF5-BC53-4FE0C7B660EF} = {B16C40E4-8839-41A1-A201-CC9B9F196B50}
+		{E6AE0844-A4CE-44AD-B2BA-414024DFD0CE} = {17B7DFA4-76FA-44C1-BB8B-35D181EE4270}
+		{81C93839-2CCD-499B-B0CC-D796A9436859} = {B28FFECB-BBC0-4A80-9898-31A6D83528F3}
+		{A249D685-082E-4864-98AC-D082B397318F} = {B16C40E4-8839-41A1-A201-CC9B9F196B50}
+		{95F77169-0E04-4DE7-816D-7ADCDB9A968F} = {16657521-2EDE-49E2-86E6-17AECD651390}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDDB7D8B-603F-4578-81DE-F0B2854F4D0C}

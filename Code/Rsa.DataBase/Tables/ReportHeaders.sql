@@ -10,6 +10,9 @@
     [IsVibrationAnalysisComplete] BIT NOT NULL DEFAULT 0, 
     [IsObservationComplete] BIT NOT NULL DEFAULT 0, 
     [IsRecommendationComplete] BIT NOT NULL DEFAULT 0, 
+    [ApprovedBy] INT NULL , 
+    [IsDocTrigger] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [FK_ReportHeaders_Users_C] FOREIGN KEY ([CreatedBy]) REFERENCES [Users]([Id]), 
-    CONSTRAINT [FK_ReportHeaders_Users_U] FOREIGN KEY ([UpdatedBy]) REFERENCES [Users]([Id]) 
+    CONSTRAINT [FK_ReportHeaders_Users_U] FOREIGN KEY ([UpdatedBy]) REFERENCES [Users]([Id]),
+    CONSTRAINT [FK_ReportHeaders_Users_A] FOREIGN KEY ([ApprovedBy]) REFERENCES [Users]([Id])
 )
