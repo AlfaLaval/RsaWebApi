@@ -1,4 +1,5 @@
-﻿using Rsa.Models.DbEntities;
+﻿using Rsa.Common.Constants;
+using Rsa.Models.DbEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -365,15 +366,19 @@ namespace DocumentGenerate
 
                 //Ack //misc
                 wordDoc.SelectContentControlsByTitle($"misc_firmcomm")[1].Range.Text = GetValueOrSpace(reportDocData.Misc?.FirmComments);
+                wordDoc.SelectContentControlsByTitle($"misc_custcomm")[1].Range.Text = GetValueOrSpace(reportDocData.Misc?.CustomerComments);
                 wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Name")[1].Range.Text = GetValueOrSpace(verifiedBy);
                 wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Date")[1].Range.Text = reportDocData.ReportHeader.CreatedOn.ToShortDateString();
                 wordDoc.SelectContentControlsByTitle($"Cust_Ack_Name")[1].Range.Text = " ";
                 wordDoc.SelectContentControlsByTitle($"Cust_Ack_Date")[1].Range.Text = " ";
-                var signature = imageHouses.FirstOrDefault(w => "signature".Equals(w.Entity));
-                if (signature != null)
-                    InsertImage(wordDoc, "firm_sign", signature.EntityRefGuid, imageHouses);
-                
-                
+                var firmSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.FirmSignature );
+                if (firmSignature != null)
+                    InsertImage(wordDoc, "firm_sign", firmSignature.EntityRefGuid, imageHouses);
+                var custSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.CustomerSignature);
+                if (custSignature != null)
+                    InsertImage(wordDoc, "cust_sign", custSignature.EntityRefGuid, imageHouses);
+
+
 
             }
             catch (Exception ex)

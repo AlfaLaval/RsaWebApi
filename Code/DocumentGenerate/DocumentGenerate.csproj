@@ -76,6 +76,10 @@
     <None Include="Templates\GoldenTemplate.docx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rsa.Common\Rsa.Common.csproj">
+      <Project>{65d509f0-7959-4840-88c9-7db26b38a262}</Project>
+      <Name>Rsa.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rsa.Models\Rsa.Models.csproj">
       <Project>{81c93839-2ccd-499b-b0cc-d796a9436859}</Project>
       <Name>Rsa.Models</Name>
