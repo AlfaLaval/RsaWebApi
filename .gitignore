@@ -12,3 +12,14 @@
 /Code/Rsa.DataBase/bin/Debug/DeploymentReport*
 /Code/Rsa.Common/bin/Debug/netstandard2.0
 /Code/Rsa.Common/obj
+/Code/DocumentGenerate/bin/Debug
+/Code/DocumentGenerate/obj/Debug
+/Code/Rsa.Models/bin/Debug/netstandard2.0
+/Code/Rsa.Models/obj/Debug/netstandard2.0
+/Code/Rsa.Models/obj
+/Code/Rsa.Services/Rsa.Services/bin/Debug/netcoreapp3.1
+/Code/Rsa.Services/Rsa.Services/obj/Debug/netcoreapp3.1
+/Code/Rsa.Services/Rsa.Services/obj
+/Code/Rsa.WebApi/bin/Debug/netcoreapp3.1
+/Code/Rsa.WebApi/obj/Debug/netcoreapp3.1
+/Code/Rsa.WebApi/obj
