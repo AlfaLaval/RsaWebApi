@@ -10,3 +10,5 @@
 /Code/Rsa.WebApi/Properties/PublishProfiles
 /Code/Rsa.DataBase/bin/Debug/Rsa.DataBase*
 /Code/Rsa.DataBase/bin/Debug/DeploymentReport*
+/Code/Rsa.Common/bin/Debug/netstandard2.0
+/Code/Rsa.Common/obj

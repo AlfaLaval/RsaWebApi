@@ -19,7 +19,8 @@ namespace Rsa.Services.ViewModels
         public List<Observation> Observations { get; set; }
         public List<Recommendation> Recommendations { get; set; }
         public Misc Misc { get; set; }
-        public int SignatureImageId { get; set; }
+        public int FirmSignatureImageId { get; set; }
+        public int CustomerSignatureImageId { get; set; }
     }
 
     public class ResponseData

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Rsa.Common.Constants;
 using Rsa.Models.DbEntities;
 using Rsa.Services.Abstractions;
 using Rsa.Services.ViewModels;
@@ -120,9 +121,13 @@ namespace Rsa.Services.Implementations
 
             reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc();
 
-            var signImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId);
-            if (signImage != null)
-                reportAllDetailsVm.SignatureImageId = signImage.Id;
+            var signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId && f.ImageLabel == StringConstants.FirmSignature);
+            if (signFirmImage != null)
+                reportAllDetailsVm.FirmSignatureImageId = signFirmImage.Id;
+
+            var signCustImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId && f.ImageLabel == StringConstants.CustomerSignature);
+            if (signCustImage != null)
+                reportAllDetailsVm.CustomerSignatureImageId = signCustImage.Id;
 
             return new ResponseData()
             {

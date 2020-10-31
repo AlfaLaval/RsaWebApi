@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Rsa.Common\Rsa.Common.csproj" />
     <ProjectReference Include="..\..\Rsa.Models\Rsa.Models.csproj" />
   </ItemGroup>
 
