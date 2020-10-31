@@ -454,17 +454,23 @@ namespace Rsa.Services.Implementations
 
         }
 
-        public async Task<ResponseData> SendToSuperVisor(int reportHeaderId)
+        public async Task<ResponseData> SendToSuperVisor(int reportHeaderId,string from)
         {
             try
             {
                 _logger.LogInformation($"{nameof(SendToSuperVisor)} - Called");
 
                 var data = _rsaContext.ReportHeaders.Find(reportHeaderId);
-                if (!data.IsDocTrigger)
+                if (data.IsDocTrigger)
                 {
-                    data.IsDocTrigger = true;
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "Document generation is in progress for this Report.Please try after some time."
+                    };
                 }
+                data.IsDocTrigger = true;
+                data.DocTriggerFrom = from;
                 await _rsaContext.SaveChangesAsync();
 
                 _logger.LogInformation($"{nameof(SendToSuperVisor)} - completed");

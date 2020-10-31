@@ -14,7 +14,7 @@ namespace Rsa.Services.Abstractions
         Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity);
         Task<ResponseData> DeleteImageById(int imageHouseId);
         Task<ResponseData> GetImages(int reportHeaderId, string entity,Guid enityRefGuid);
-        Task<ResponseData> SendToSuperVisor(int reportHeaderId);
+        Task<ResponseData> SendToSuperVisor(int reportHeaderId,string from);
         Task<ResponseData> GetUserLoginData(string username, string password);
 
     }

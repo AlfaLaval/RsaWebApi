@@ -24,3 +24,7 @@
 /Code/Rsa.WebApi/obj/Debug/netcoreapp3.1
 /Code/Rsa.WebApi/obj
 /Code/Rsa.DataBase/obj/Debug
+/Code/.vs/Rsa.WebApi/config/applicationhost.config
+/Code/DocumentGenerate/obj/Release
+/Code/Rsa.Common/bin/Release/netstandard2.0
+/Code/Rsa.Services/Rsa.Services/bin/Release/netcoreapp3.1

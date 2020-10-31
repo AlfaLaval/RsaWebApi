@@ -50,6 +50,7 @@ namespace Rsa.Models.DbEntities
         public bool IsRecommendationComplete { get; set; }
         public bool IsDocTrigger { get; set; }
 		public int? ApprovedBy { get; set; }
+        public string DocTriggerFrom { get; set; } //FINAL // DRAFT
 	}
 
 	public class SafetyFirstCheck
@@ -270,5 +271,9 @@ namespace Rsa.Models.DbEntities
         public int ReportHeaderId { get; set; }
         public string FirmComments { get; set; }
 		public string CustomerComments { get; set; }
+        public string FirmName { get; set; }
+		public string CustomerName { get; set; }
+        public DateTime FirmDate { get; set; }
+		public DateTime CustomerDate { get; set; }
 	}
 }

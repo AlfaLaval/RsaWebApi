@@ -35,8 +35,8 @@ namespace DocumentGenerate
                         filename = doc.Generate(reportData, userData.DisplayName, imageDataToProcess);
                         _logger.Info("GenerateWord Completed");
                         string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
-
-                        Notification.SendEmail(userData.Email, "Decanter Report", messageBody, filename);
+                        string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
+                        Notification.SendEmail(userData.Email, subject , messageBody, filename);
                         UpdateDocGenerationFlag(headerId);
                         _logger.Info("Sending Email Completed");
                     }
@@ -66,6 +66,7 @@ namespace DocumentGenerate
             data.ReportHeader = rsaContext.ReportHeaders.AsNoTracking()
                 .FirstOrDefault(f => f.Id == reportHeaderId);
             data.SafetyFirstCheck = rsaContext.SafetyFirstChecks.AsNoTracking()
+                .Include("SafetyFirstCheckDetails")
                 .FirstOrDefault(w => w.ReportHeaderId == reportHeaderId);
             data.CustomerEquipmentActivity = rsaContext.CustomerEquipmentActivities.AsNoTracking()
                 .FirstOrDefault(w => w.ReportHeaderId == reportHeaderId);

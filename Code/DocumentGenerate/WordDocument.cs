@@ -12,7 +12,6 @@ namespace DocumentGenerate
     {
         private readonly log4net.ILog _logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-
         public string Generate(ReportAllDetailsDocVm reportData, string verifiedBy, List<ImageHouse> imageHouses)
         {
             if (reportData == null)
@@ -126,9 +125,81 @@ namespace DocumentGenerate
             {
                 var sfc = reportDocData.SafetyFirstCheck;
                 var cus = reportDocData.CustomerEquipmentActivity;
-                //var sfcDetails = reportDocData.SafetyFirstCheck?.SafetyFirstCheckDetails;
+                
                 if (sfc != null && cus != null)
                 {
+
+                    wordDoc.SelectContentControlsByTitle("sfc_Customer")[1].Range.Text = GetValueOrSpace(sfc.ProjectName);
+                    wordDoc.SelectContentControlsByTitle("sfc_ServiceEngineer")[1].Range.Text = GetValueOrSpace(sfc.EngineerName);
+                    wordDoc.SelectContentControlsByTitle("sfc_Job_No")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
+                    wordDoc.SelectContentControlsByTitle("sfc_startdate")[1].Range.Text = sfc.StartDate.ToShortDateString();
+                    wordDoc.SelectContentControlsByTitle("sfc_contactno")[1].Range.Text = GetValueOrSpace(sfc.ContactNumber);
+                    wordDoc.SelectContentControlsByTitle("sfc_sitesafetycontact")[1].Range.Text = GetValueOrSpace(sfc.SiteSafetyContact);
+                    var sfcDetails = sfc.SafetyFirstCheckDetails;
+                    if (sfcDetails != null)
+                    {
+                        var sfcd1 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "STOP-THINK-ACT");
+                        if (sfcd1 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_stopthinkact")[1].Checked = sfcd1.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_stopthinkact_rm")[1].Range.Text = sfcd1.Remarks;
+                        }
+                        var sfcd2 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Permit to Work(PTW)");
+                        if (sfcd2 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_ptw")[1].Checked = sfcd2.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_ptw_rm")[1].Range.Text = sfcd2.Remarks;
+                        }
+                        var sfcd3 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Fitness of Personnel");
+                        if (sfcd3 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_fitness")[1].Checked = sfcd3.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_fitness_rm")[1].Range.Text = sfcd3.Remarks;
+                        }
+                        var sfcd4 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Work Area Evaluation");
+                        if (sfcd4 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_workareaeval")[1].Checked = sfcd4.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_workareaeval_rm")[1].Range.Text = sfcd4.Remarks;
+                        }
+                        var sfcd5 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Evacuation Plan");
+                        if (sfcd5 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_evalplan")[1].Checked = sfcd5.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_evalplan_rm")[1].Range.Text = sfcd5.Remarks;
+                        }
+                        var sfcd6 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Method Statement Review");
+                        if (sfcd6 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_methstmtrev")[1].Checked = sfcd6.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_methstmtrev_rm")[1].Range.Text = sfcd6.Remarks;
+                        }
+                        var sfcd7 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Risk Assessment Review");
+                        if (sfcd7 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_riskassessrev")[1].Checked = sfcd7.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_riskassessrev_rm")[1].Range.Text = sfcd7.Remarks;
+                        }
+                        var sfcd8 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Mandatory PPE");
+                        if (sfcd8 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_madatoryppe")[1].Checked = sfcd8.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_madatoryppe_rm")[1].Range.Text = sfcd8.Remarks;
+                        }
+                        var sfcd9 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Condition of tools/gears");
+                        if (sfcd9 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_cond_tools")[1].Checked = sfcd9.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_cond_tools_rm")[1].Range.Text = sfcd9.Remarks;
+                        }
+                        var sfcd10 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "First Aid");
+                        if (sfcd10 != null)
+                        {
+                            wordDoc.SelectContentControlsByTitle($"sfc_firstaid")[1].Checked = sfcd10.IsSelected;
+                            wordDoc.SelectContentControlsByTitle($"sfc_firstaid_rm")[1].Range.Text = sfcd10.Remarks;
+                        }
+
+                    }
                     wordDoc.SelectContentControlsByTitle("Job_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
                     wordDoc.SelectContentControlsByTitle("Sub_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
 
@@ -309,7 +380,8 @@ namespace DocumentGenerate
                         if(reportDocData.Recommendations.Count >= i)
                         {
                             var recomm = reportDocData.Recommendations[i-1];
-                            InsertImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
+                            InsertOrRemoveImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
+                            wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Range.Text = GetValueOrSpace(recomm.Remarks);
                             wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Checked = recomm.ImmediateAction;
                             wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Checked = recomm.MidTermAction;
                             wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Checked = recomm.Observation;
@@ -317,6 +389,7 @@ namespace DocumentGenerate
                         else
                         {
                             RemoveImage(wordDoc, $"Recomm_Pic_{i}");
+                            wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Delete(true);
                             wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Delete(true);
                             wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Delete(true);
                             wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Delete(true);
@@ -352,7 +425,7 @@ namespace DocumentGenerate
                         {
                             wordDoc.SelectContentControlsByTitle($"{obs.Key}Obs")[1].Range.Text = GetValueOrSpace(dbObs.Remarks);
                             wordDoc.SelectContentControlsByTitle($"{obs.Key}Act")[1].Range.Text = GetValueOrSpace(dbObs.ActionTaken);
-                            InsertImage(wordDoc, $"{obs.Key}Pic", dbObs.EntityRefGuid, imageHouses);
+                            InsertOrRemoveImage(wordDoc, $"{obs.Key}Pic", dbObs.EntityRefGuid, imageHouses);
                         }
                         else
                         {
@@ -363,20 +436,23 @@ namespace DocumentGenerate
                     }
                 }
 
-
                 //Ack //misc
-                wordDoc.SelectContentControlsByTitle($"misc_firmcomm")[1].Range.Text = GetValueOrSpace(reportDocData.Misc?.FirmComments);
-                wordDoc.SelectContentControlsByTitle($"misc_custcomm")[1].Range.Text = GetValueOrSpace(reportDocData.Misc?.CustomerComments);
-                wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Name")[1].Range.Text = GetValueOrSpace(verifiedBy);
-                wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Date")[1].Range.Text = reportDocData.ReportHeader.CreatedOn.ToShortDateString();
-                wordDoc.SelectContentControlsByTitle($"Cust_Ack_Name")[1].Range.Text = " ";
-                wordDoc.SelectContentControlsByTitle($"Cust_Ack_Date")[1].Range.Text = " ";
+                var miscData = reportDocData.Misc;
+                if (miscData != null)
+                {
+                    wordDoc.SelectContentControlsByTitle($"misc_firmcomm")[1].Range.Text = GetValueOrSpace(miscData.FirmComments);
+                    wordDoc.SelectContentControlsByTitle($"misc_custcomm")[1].Range.Text = GetValueOrSpace(miscData.CustomerComments);
+                    wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Name")[1].Range.Text = GetValueOrSpace(miscData.FirmName);
+                    wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Date")[1].Range.Text = miscData.FirmDate.ToShortDateString();
+                    wordDoc.SelectContentControlsByTitle($"Cust_Ack_Name")[1].Range.Text = GetValueOrSpace(miscData.CustomerName);
+                    wordDoc.SelectContentControlsByTitle($"Cust_Ack_Date")[1].Range.Text = miscData.CustomerDate.ToShortDateString(); ;
+                }
                 var firmSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.FirmSignature );
                 if (firmSignature != null)
-                    InsertImage(wordDoc, "firm_sign", firmSignature.EntityRefGuid, imageHouses);
+                    InsertOrRemoveImage(wordDoc, "firm_sign", firmSignature.EntityRefGuid, imageHouses);
                 var custSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.CustomerSignature);
                 if (custSignature != null)
-                    InsertImage(wordDoc, "cust_sign", custSignature.EntityRefGuid, imageHouses);
+                    InsertOrRemoveImage(wordDoc, "cust_sign", custSignature.EntityRefGuid, imageHouses);
 
 
 
@@ -388,7 +464,7 @@ namespace DocumentGenerate
 
         }
 
-        private void InsertImage(Word.Document wordDoc, string title,Guid entityRefId, List<ImageHouse> imageHouses)
+        private void InsertOrRemoveImage(Word.Document wordDoc, string title,Guid entityRefId, List<ImageHouse> imageHouses)
         {
             var img = imageHouses.Where(w => w.EntityRefGuid == entityRefId).FirstOrDefault();
             if (img != null)
@@ -400,6 +476,10 @@ namespace DocumentGenerate
                     {
                         Word.Range rngPic = wordDoc.SelectContentControlsByTag(title)[1].Range;
                         rngPic.InlineShapes.AddPicture(imagePath);
+                    }
+                    else
+                    {
+                        RemoveImage(wordDoc,title);
                     }
                 }
                 catch (Exception ex)
