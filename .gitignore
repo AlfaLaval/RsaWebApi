@@ -28,3 +28,5 @@
 /Code/DocumentGenerate/obj/Release
 /Code/Rsa.Common/bin/Release/netstandard2.0
 /Code/Rsa.Services/Rsa.Services/bin/Release/netcoreapp3.1
+/Code/Rsa.DataBase/Rsa.DataBase.dbmdl
+/Code/Rsa.DataBase/Rsa.DataBase.jfm

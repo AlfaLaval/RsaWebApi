@@ -45,6 +45,7 @@ namespace Rsa.Services.Implementations
                 reportHeader.IsObservationComplete = false;
                 reportHeader.IsRecommendationComplete = false;
                 reportHeader.ApprovedBy = null;
+                reportHeader.DocTriggerFrom = "DRAFT";
 
                 _rsaContext.Add(reportHeader);
                 if (_rsaContext.SaveChanges() > 0)
@@ -94,7 +95,10 @@ namespace Rsa.Services.Implementations
             {
                 reportAllDetailsVm.CustomerEquipmentActivity = new CustomerEquipmentActivity()
                 {
-                    ReportHeaderId = reportHeaderId
+                    ReportHeaderId = reportHeaderId,
+                    PreviousServiceDate = DateTime.Now,
+                    CurrentServiceDate = DateTime.Now,
+                    ReportDate = DateTime.Now
                 };
             }
             reportAllDetailsVm.VibrationAnalysisHeader = _rsaContext.VibrationAnalysisHeaders.AsNoTracking()
@@ -119,7 +123,7 @@ namespace Rsa.Services.Implementations
                 recomms = new List<Recommendation>();
             reportAllDetailsVm.Recommendations = recomms;
 
-            reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc();
+            reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc() { FirmDate = DateTime.Now, CustomerDate = DateTime.Now };
 
             var signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId && f.ImageLabel == StringConstants.FirmSignature);
             if (signFirmImage != null)
@@ -433,6 +437,8 @@ namespace Rsa.Services.Implementations
                 if (reportAllDetails.Misc.Id == 0)
                 {
                     reportAllDetails.Misc.ReportHeaderId = reportHeaderId;
+                    //reportAllDetails.Misc.CustomerDate = DateTime.Now;
+                    //reportAllDetails.Misc.FirmDate = DateTime.Now;
                     _rsaContext.Add(reportAllDetails.Misc);
                 }
                 else

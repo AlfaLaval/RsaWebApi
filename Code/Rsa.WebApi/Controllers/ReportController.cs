@@ -112,7 +112,7 @@ namespace Rsa.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{nameof(GetReportDetails)} - Error", ex);
+                _logger.LogError(ex,$"{nameof(GetReportDetails)} - Error");
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { data = "Error occurred. Please contact admin" });
             }
