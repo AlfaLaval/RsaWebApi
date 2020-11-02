@@ -38,7 +38,7 @@ namespace Rsa.Services.Implementations
                 _logger.LogInformation("Create Report Called");
 
                 reportHeader.CreatedOn = DateTime.UtcNow;
-                reportHeader.CreatedBy = 1;
+                reportHeader.CreatedBy = reportHeader.CreatedBy;
                 reportHeader.IsSafetyFirstComplete = false;
                 reportHeader.IsCustomerEquipmentComplete = false;
                 reportHeader.IsVibrationAnalysisComplete = false;
