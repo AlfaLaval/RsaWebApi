@@ -181,8 +181,8 @@ namespace Rsa.Services.Implementations
                 _logger.LogInformation($"Img Saved - Called");
                 if ("signature".Equals(imageEntity.Entity))
                 {
-                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
                     filePath = $"{ImageUploadPath}{newGuid}.png";
+                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
                 }
                 else
                     File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
@@ -274,30 +274,18 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetImages(int reportHeaderId, string entity,Guid entityRefGuid)
+        public async Task<ResponseData> GetImagesByEntityRefGuid(int reportHeaderId, string entity,Guid entityRefGuid)
         {
             try
             {
-                _logger.LogInformation($"{nameof(GetImages)} - Called");
+                _logger.LogInformation($"{nameof(GetImagesByEntityRefGuid)} - Called");
                 List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
                 var images = await _rsaContext.ImageHouses.AsNoTracking()
                     .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId
                     && w.EntityRefGuid == entityRefGuid)
                     .ToListAsync();
-                foreach (var img in images)
-                {
-                    vmImageDataList.Add(
-                        new VmImageSaveEntity
-                        {
-                            ImageHouseId = img.Id,
-                            Base64 = GetBase64(img.ImageFileGuid.ToString()),
-                            ImageLabel = img.ImageLabel,
-                            Entity = img.Entity,
-                            EntityRefGuid = img.EntityRefGuid,
-                            ReportHeaderId = reportHeaderId
-                        });
-                }
-                _logger.LogInformation($"{nameof(GetImages)} - completed");
+                vmImageDataList = GetImages(reportHeaderId, images);
+                _logger.LogInformation($"{nameof(GetImagesByEntityRefGuid)} - completed");
                 return new ResponseData()
                 {
                     status = ResponseStatus.success,
@@ -306,7 +294,7 @@ namespace Rsa.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{nameof(GetImages)} - Error.", ex);
+                _logger.LogError($"{nameof(GetImagesByEntityRefGuid)} - Error.", ex);
                 return new ResponseData()
                 {
                     status = ResponseStatus.error,
@@ -315,16 +303,63 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        private string GetBase64(string guid)
+        public async Task<ResponseData> GetImagesByImageLabels(int reportHeaderId, string entity, string[] labels)
         {
             try
             {
-                string filePath = $"{ImageUploadPath}{guid}.jpeg";
+                _logger.LogInformation($"{nameof(GetImagesByImageLabels)} - Called");
+                List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
+                var images = await _rsaContext.ImageHouses.AsNoTracking()
+                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId && labels.Contains(w.ImageLabel))
+                    .ToListAsync();
+                vmImageDataList = GetImages(reportHeaderId, images);
+                _logger.LogInformation($"{nameof(GetImagesByImageLabels)} - completed");
+                return new ResponseData()
+                {
+                    status = ResponseStatus.success,
+                    data = vmImageDataList
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(GetImagesByImageLabels)} - Error.", ex);
+                return new ResponseData()
+                {
+                    status = ResponseStatus.error,
+                    message = ex.Message
+                };
+            }
+        }
+        private List<VmImageSaveEntity> GetImages(int reportHeaderId, List<ImageHouse> images)
+        {
+            List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
+
+            foreach (var img in images)
+            {
+                vmImageDataList.Add(
+                    new VmImageSaveEntity
+                    {
+                        ImageHouseId = img.Id,
+                        Base64 = GetBase64(img.ImageFileGuid.ToString(), img.Entity == "signature" ? "png":"jpeg"),
+                        ImageLabel = img.ImageLabel,
+                        Entity = img.Entity,
+                        EntityRefGuid = img.EntityRefGuid,
+                        ReportHeaderId = reportHeaderId
+                    });
+            }
+            return vmImageDataList;
+        }
+
+        private string GetBase64(string guid,string extension)
+        {
+            try
+            {
+                string filePath = $"{ImageUploadPath}{guid}.{extension}";
                 var fileBytes = File.ReadAllBytes(filePath);
 
                 string encodedFile = Convert.ToBase64String(fileBytes);
 
-                return "data:image/jpeg;base64," + encodedFile;
+                return $"data:image/{extension};base64,{encodedFile}";
             }
             catch (Exception ex)
             {

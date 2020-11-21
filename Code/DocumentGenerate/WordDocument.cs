@@ -142,66 +142,66 @@ namespace DocumentGenerate
                         if (sfcd1 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_stopthinkact")[1].Checked = sfcd1.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_stopthinkact_rm")[1].Range.Text = sfcd1.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_stopthinkact_rm")[1].Range.Text = GetValueOrSpace(sfcd1?.Remarks);
                         var sfcd2 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Permit to Work(PTW)");
                         if (sfcd2 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_ptw")[1].Checked = sfcd2.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_ptw_rm")[1].Range.Text = sfcd2.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_ptw_rm")[1].Range.Text = GetValueOrSpace(sfcd2.Remarks);
                         var sfcd3 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Fitness of Personnel");
                         if (sfcd3 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_fitness")[1].Checked = sfcd3.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_fitness_rm")[1].Range.Text = sfcd3.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_fitness_rm")[1].Range.Text = GetValueOrSpace(sfcd3.Remarks);
                         var sfcd4 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Work Area Evaluation");
                         if (sfcd4 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_workareaeval")[1].Checked = sfcd4.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_workareaeval_rm")[1].Range.Text = sfcd4.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_workareaeval_rm")[1].Range.Text = GetValueOrSpace(sfcd4.Remarks);
                         var sfcd5 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Evacuation Plan");
                         if (sfcd5 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_evalplan")[1].Checked = sfcd5.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_evalplan_rm")[1].Range.Text = sfcd5.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_evalplan_rm")[1].Range.Text = GetValueOrSpace(sfcd5.Remarks);
                         var sfcd6 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Method Statement Review");
                         if (sfcd6 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_methstmtrev")[1].Checked = sfcd6.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_methstmtrev_rm")[1].Range.Text = sfcd6.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_methstmtrev_rm")[1].Range.Text = GetValueOrSpace(sfcd6.Remarks);
                         var sfcd7 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Risk Assessment Review");
                         if (sfcd7 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_riskassessrev")[1].Checked = sfcd7.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_riskassessrev_rm")[1].Range.Text = sfcd7.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_riskassessrev_rm")[1].Range.Text = GetValueOrSpace(sfcd7.Remarks);
                         var sfcd8 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Mandatory PPE");
                         if (sfcd8 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_madatoryppe")[1].Checked = sfcd8.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_madatoryppe_rm")[1].Range.Text = sfcd8.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_madatoryppe_rm")[1].Range.Text = GetValueOrSpace(sfcd8.Remarks);
                         var sfcd9 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "Condition of tools/gears");
                         if (sfcd9 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_cond_tools")[1].Checked = sfcd9.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_cond_tools_rm")[1].Range.Text = sfcd9.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_cond_tools_rm")[1].Range.Text = GetValueOrSpace(sfcd9.Remarks);
                         var sfcd10 = sfcDetails.FirstOrDefault(f => f.CheckPointName == "First Aid");
                         if (sfcd10 != null)
                         {
                             wordDoc.SelectContentControlsByTitle($"sfc_firstaid")[1].Checked = sfcd10.IsSelected;
-                            wordDoc.SelectContentControlsByTitle($"sfc_firstaid_rm")[1].Range.Text = sfcd10.Remarks;
                         }
+                        wordDoc.SelectContentControlsByTitle($"sfc_firstaid_rm")[1].Range.Text = GetValueOrSpace(sfcd10.Remarks);
 
                     }
                     wordDoc.SelectContentControlsByTitle("Job_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
-                    wordDoc.SelectContentControlsByTitle("Sub_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
+                    //wordDoc.SelectContentControlsByTitle("Sub_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
 
                     wordDoc.SelectContentControlsByTitle("Cea_Customer")[1].Range.Text = GetValueOrSpace(sfc.ProjectName);
                     wordDoc.SelectContentControlsByTitle("Cea_ServiceEngineer")[1].Range.Text = GetValueOrSpace(sfc.EngineerName);
@@ -328,10 +328,10 @@ namespace DocumentGenerate
                         { "Bt_Md", "Bearing Temp(Deg C)~Temp: MD" },
                         { "Bt_Bd", "Bearing Temp(Deg C)~Temp: BD" },
 
-                        { "Vm_Main_Min", "Measurements(mm/sec)~Main Drive	Min" },
-                        { "Vm_Main_Max", "Measurements(mm/sec)~Main Drive	Max" },
-                        { "Vm_Back_Min", "Measurements(mm/sec)~Back Drive	Min" },
-                        { "Vm_Back_Max", "Measurements(mm/sec)~Back Drive	Max" },
+                        { "Vm_Main_Min", "Measurements(mm/sec) Main Drive~Min" },
+                        { "Vm_Main_Max", "Measurements(mm/sec) Main Drive~Max" },
+                        { "Vm_Back_Min", "Measurements(mm/sec) Back Drive~Min" },
+                        { "Vm_Back_Max", "Measurements(mm/sec) Back Drive~Max" },
 
                     };
 
@@ -361,6 +361,7 @@ namespace DocumentGenerate
 
                     wordDoc.SelectContentControlsByTitle($"Md_Check")[1].Checked = vibAna.MdMotor;
                     wordDoc.SelectContentControlsByTitle($"Bd_Check")[1].Checked = vibAna.BdMotor;
+
                     wordDoc.SelectContentControlsByTitle($"Md_DE_Main")[1].Range.Text = GetValueOrSpace(vibAna.MdDriveEndMain);
                     wordDoc.SelectContentControlsByTitle($"Md_NDE_Main")[1].Range.Text = GetValueOrSpace(vibAna.MdNonDriveEndMain);
                     wordDoc.SelectContentControlsByTitle($"Md_DE_Back")[1].Range.Text = GetValueOrSpace(vibAna.MdDriveEndBack);
@@ -404,6 +405,7 @@ namespace DocumentGenerate
                     { "Flx_Conn_","Flexibleconnections"},
                     { "MainDr_BackDr_","MainDrive_BackDriveMotor"},
                     { "Sli_Gate_Ins_","SlideGateInspection"},
+                    { "Gear_Box_Ins_","GearBoxInspection"},
                     { "Dec_Fra_Bed_","DecanterFrameBed_Baffle"},
                     { "Small_End_Hub_","SmallEndHub"},
                     { "Large_End_Hub_","LargeEndHub"},
@@ -469,7 +471,8 @@ namespace DocumentGenerate
             var img = imageHouses.Where(w => w.EntityRefGuid == entityRefId).FirstOrDefault();
             if (img != null)
             {
-                string imagePath = $"{AppSettings.ImageUploadPath}{img.ImageFileGuid}.jpeg";
+                var ext = img.Entity == "signature" ? "png" : "jpeg";
+                string imagePath = $"{AppSettings.ImageUploadPath}{img.ImageFileGuid}.{ext}";
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(imagePath))
@@ -487,6 +490,10 @@ namespace DocumentGenerate
                     _logger.Error("Error in Insert Image", ex);
                 }
             }
+            else
+            {
+                RemoveImage(wordDoc, title);
+            }
         }
 
         private void RemoveImage(Word.Document wordDoc, string title)
@@ -499,7 +506,6 @@ namespace DocumentGenerate
             catch (Exception ex)
             {
                 _logger.Error("Error in Remove Image", ex);
-
             }
         }
 

@@ -143,19 +143,32 @@ namespace Rsa.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("getimages")]
+        [Route("getimagesbyentityrefguid")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetImages([FromQuery]int reportHeaderId, 
+        public async Task<ActionResult> GetImagesByEntityRefGuid([FromQuery]int reportHeaderId, 
             [FromQuery] string entity,[FromQuery] string enityRefGuid)
         {
             if (Guid.TryParse(enityRefGuid, out var guid))
             {
-                var result = await _reportActivities.GetImages(reportHeaderId, entity, guid);
+                var result = await _reportActivities.GetImagesByEntityRefGuid(reportHeaderId, entity, guid);
                 return Ok(result);
             }
             return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("getimagesbyimagelabels")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetImagesByImageLabels([FromQuery] int reportHeaderId,
+            [FromQuery] string entity, [FromQuery] string[] imageLabels)
+        {
+
+            var result = await _reportActivities.GetImagesByImageLabels(reportHeaderId, entity, imageLabels);
+            return Ok(result);
         }
 
         //[Authorize]

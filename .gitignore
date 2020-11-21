@@ -30,3 +30,5 @@
 /Code/Rsa.Services/Rsa.Services/bin/Release/netcoreapp3.1
 /Code/Rsa.DataBase/Rsa.DataBase.dbmdl
 /Code/Rsa.DataBase/Rsa.DataBase.jfm
+/Code/Rsa.Repository/Rsa.Repository/obj
+/.vs
