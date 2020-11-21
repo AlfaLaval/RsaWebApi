@@ -371,31 +371,70 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle($"Bd_DE_Back")[1].Range.Text = GetValueOrSpace(vibAna.BdDriveEndBack);
                     wordDoc.SelectContentControlsByTitle($"Bd_NDE_Back")[1].Range.Text = GetValueOrSpace(vibAna.BdNonDriveEndBack);
                     wordDoc.SelectContentControlsByTitle("Vah_Remarks")[1].Range.Text = GetValueOrSpace(vibAna.Remarks);
+                    if (!string.IsNullOrWhiteSpace(vibAna.Remarks))
+                    {
+                        wordDoc.SelectContentControlsByTitle("Vah_Remarks")[1].Range.Font.Color = Word.WdColor.wdColorRed;
+                    }
                 }
 
                 //Recommendations
                 if (reportDocData.Recommendations != null)
                 {
-                    for(int i=1;i<=5;i++)
-                    {
-                        if(reportDocData.Recommendations.Count >= i)
+                    var recommTableIndex = 0;
+
+                    for (int i = 1; i <= wordDoc.Tables.Count; i++)
+                        if (wordDoc.Tables[i].Title == "SampleRecomm")
                         {
-                            var recomm = reportDocData.Recommendations[i-1];
-                            InsertOrRemoveImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
-                            wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Range.Text = GetValueOrSpace(recomm.Remarks);
-                            wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Checked = recomm.ImmediateAction;
-                            wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Checked = recomm.MidTermAction;
-                            wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Checked = recomm.Observation;
+                            recommTableIndex = i;
+                            break;
                         }
-                        else
+
+
+                    if (recommTableIndex > 0)
+                    {
+                        int sno = 1;
+                        foreach (var recomm in reportDocData.Recommendations)
                         {
-                            RemoveImage(wordDoc, $"Recomm_Pic_{i}");
-                            wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Delete(true);
-                            wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Delete(true);
-                            wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Delete(true);
-                            wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Delete(true);
+                            var row = wordDoc.Tables[recommTableIndex].Rows.Add();
+                            row.Height = 30.0f; //1.2 cm
+                            row.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+                            row.Shading.BackgroundPatternColor = Word.WdColor.wdColorWhite; 
+                            row.Cells[1].Range.Text = $"0{sno}";
+                            row.Cells[1].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[1].Range.Font.Bold = 0;
+
+                            row.Cells[2].Range.Text = GetValueOrSpace(recomm.Remarks);
+                            row.Cells[2].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[2].Range.Font.Bold = 0;
+                            row.Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+
+                            row.Cells[3].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.ImmediateAction;
+                            row.Cells[4].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.MidTermAction;
+                            row.Cells[5].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.Observation;
+                            sno++;
                         }
                     }
+
+                    //for(int i=1;i<=5;i++)
+                    //{
+                    //    if(reportDocData.Recommendations.Count >= i)
+                    //    {
+                    //        var recomm = reportDocData.Recommendations[i-1];
+                    //        InsertOrRemoveImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Range.Text = GetValueOrSpace(recomm.Remarks);
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Checked = recomm.ImmediateAction;
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Checked = recomm.MidTermAction;
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Checked = recomm.Observation;
+                    //    }
+                    //    else
+                    //    {
+                    //        RemoveImage(wordDoc, $"Recomm_Pic_{i}");
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Delete(true);
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Delete(true);
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Delete(true);
+                    //        wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Delete(true);
+                    //    }
+                    //}
                 }
 
                 //Observations
