@@ -378,103 +378,146 @@ namespace DocumentGenerate
                 }
 
                 //Recommendations
-                if (reportDocData.Recommendations != null)
-                {
-                    var recommTableIndex = 0;
+                var recommTableIndex = 0;
 
-                    for (int i = 1; i <= wordDoc.Tables.Count; i++)
-                        if (wordDoc.Tables[i].Title == "SampleRecomm")
-                        {
-                            recommTableIndex = i;
-                            break;
-                        }
-
-
-                    if (recommTableIndex > 0)
+                for (int i = 1; i <= wordDoc.Tables.Count; i++)
+                    if (wordDoc.Tables[i].Title == "RecommHead")
                     {
-                        int sno = 1;
-                        foreach (var recomm in reportDocData.Recommendations)
-                        {
-                            var row = wordDoc.Tables[recommTableIndex].Rows.Add();
-                            row.Height = 30.0f; //1.2 cm
-                            row.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
-                            row.Shading.BackgroundPatternColor = Word.WdColor.wdColorWhite; 
-                            row.Cells[1].Range.Text = $"0{sno}";
-                            row.Cells[1].Range.Underline = Word.WdUnderline.wdUnderlineNone;
-                            row.Cells[1].Range.Font.Bold = 0;
-
-                            row.Cells[2].Range.Text = GetValueOrSpace(recomm.Remarks);
-                            row.Cells[2].Range.Underline = Word.WdUnderline.wdUnderlineNone;
-                            row.Cells[2].Range.Font.Bold = 0;
-                            row.Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-
-                            row.Cells[3].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.ImmediateAction;
-                            row.Cells[4].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.MidTermAction;
-                            row.Cells[5].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.Observation;
-                            sno++;
-                        }
+                        recommTableIndex = i;
+                        break;
                     }
+                if (recommTableIndex > 0 && reportDocData.Recommendations != null && reportDocData.Recommendations.Count > 0)
+                {
+                    int sno = 1;
+                    foreach (var recomm in reportDocData.Recommendations)
+                    {
+                        var row = wordDoc.Tables[recommTableIndex].Rows.Add();
+                        row.Height = 30.0f; //1.2 cm
+                        row.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+                        row.Shading.BackgroundPatternColor = Word.WdColor.wdColorWhite;
 
-                    //for(int i=1;i<=5;i++)
-                    //{
-                    //    if(reportDocData.Recommendations.Count >= i)
-                    //    {
-                    //        var recomm = reportDocData.Recommendations[i-1];
-                    //        InsertOrRemoveImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Range.Text = GetValueOrSpace(recomm.Remarks);
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Checked = recomm.ImmediateAction;
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Checked = recomm.MidTermAction;
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Checked = recomm.Observation;
-                    //    }
-                    //    else
-                    //    {
-                    //        RemoveImage(wordDoc, $"Recomm_Pic_{i}");
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_RM_{i}")[1].Delete(true);
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_IA_{i}")[1].Delete(true);
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_MTA_{i}")[1].Delete(true);
-                    //        wordDoc.SelectContentControlsByTitle($"Recomm_Obs_{i}")[1].Delete(true);
-                    //    }
-                    //}
+                        row.Cells[1].Range.Text = $"0{sno}";
+                        row.Cells[1].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                        row.Cells[1].Range.Font.Bold = 0;
+
+                        row.Cells[2].Range.Text = GetValueOrSpace(recomm.Remarks);
+                        row.Cells[2].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                        row.Cells[2].Range.Font.Bold = 0;
+                        row.Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+
+                        row.Cells[3].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.ImmediateAction;
+                        row.Cells[4].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.MidTermAction;
+                        row.Cells[5].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = recomm.Observation;
+                        sno++;
+                        //InsertOrRemoveImage(wordDoc, $"Recomm_Pic_{i}", recomm.EntityRefGuid, imageHouses);
+                    }
+                }
+                else
+                {
+                    wordDoc.SelectContentControlsByTitle("RecommHead")[1].Delete(true);
+                    if(recommTableIndex>0)
+                        wordDoc.Tables[recommTableIndex].Delete();
                 }
 
                 //Observations
+
                 var observations = new Dictionary<string, string> {
-                    {"Dec_Out_Fp_","DecanterOutlook_FrameParts_"},
-                    { "Vib_Dam_","VibrationDampers"},
-                    { "Flx_Conn_","Flexibleconnections"},
-                    { "MainDr_BackDr_","MainDrive_BackDriveMotor"},
-                    { "Sli_Gate_Ins_","SlideGateInspection"},
-                    { "Gear_Box_Ins_","GearBoxInspection"},
-                    { "Dec_Fra_Bed_","DecanterFrameBed_Baffle"},
-                    { "Small_End_Hub_","SmallEndHub"},
-                    { "Large_End_Hub_","LargeEndHub"},
-                    { "Conv_Feed_Zone_","Conveyor_Feedzonewearliner"},
-                    { "Conv_Flight_Tiles_","Conveyor_Flight_Tiles"},
-                    { "Feed_Tube_Prot_","Feedtube_ProtectingTube"},
-                    { "Cond_Wear_Strip_","Conditionofwearstrips_Bowl_"},
-                    { "Main_Bear_House_","MainberingHousingseat_Large_SmallEnd"},
-                    { "Conv_Seat_","Conveyorbearingseat_Large_SmallEnd"},
-                    { "Conv_Axial_Play_","ConveyorAxialplay_height_gapcheck"}
+                    { "DecanterOutlook_FrameParts_","Decanter Outlook (Frame Parts)"},
+                    { "VibrationDampers","Vibration Dampers"},
+                    { "Flexibleconnections","Flexible connections"},
+                    { "MainDrive_BackDriveMotor","Main Drive/Back Drive Motor"},
+                    { "SlideGateInspection","Slide Gate Inspection"},
+                    { "GearBoxInspection","Gear Box Inspection"},
+                    { "DecanterFrameBed_Baffle","Decanter Frame Bed / Baffle"},
+                    { "SmallEndHub","Small End Hub"},
+                    { "LargeEndHub","Large End Hub"},
+                    { "Conveyor_Feedzonewearliner","Conveyor - Feed zone wear liner"},
+                    { "Conveyor_Flight_Tiles","Conveyor - Flight / Tiles"},
+                    { "Feedtube_ProtectingTube","Feed tube / Protecting Tube"},
+                    { "Conditionofwearstrips_Bowl_","Condition of wear strips (Bowl)"},
+                    { "MainberingHousingseat_Large_SmallEnd","Main bering Housing seat - Large / Small End"},
+                    { "Conveyorbearingseat_Large_SmallEnd","Conveyor bearing seat - Large /Small End"},
+                    { "ConveyorAxialplay_height_gapcheck","Conveyor Axial play - height / gap check"}
                 };
 
-                if (reportDocData.Observations != null)
-                {
-                    foreach (var obs in observations)
+                var obserTableIndex = 0;
+                for (int i = 1; i <= wordDoc.Tables.Count; i++)
+                    if (wordDoc.Tables[i].Title == "ObsHead")
                     {
-                        var dbObs = reportDocData.Observations.Where(w => w.Title == obs.Value).FirstOrDefault();
-                        if (dbObs != null)
+                        obserTableIndex = i;
+                        break;
+                    }
+
+                if (obserTableIndex > 0 && reportDocData.Observations != null && reportDocData.Observations.Count > 0)
+                {
+                    int iteration = 0;
+                    foreach (var obs in reportDocData.Observations)
+                    {
+                        if (!observations.ContainsKey(obs.Title))
+                            continue;
+
+                        Word.Row row1 = null;
+                        Word.Row row2 = null;
+                        if (iteration > 0)
                         {
-                            wordDoc.SelectContentControlsByTitle($"{obs.Key}Obs")[1].Range.Text = GetValueOrSpace(dbObs.Remarks);
-                            wordDoc.SelectContentControlsByTitle($"{obs.Key}Act")[1].Range.Text = GetValueOrSpace(dbObs.ActionTaken);
-                            InsertOrRemoveImage(wordDoc, $"{obs.Key}Pic", dbObs.EntityRefGuid, imageHouses);
+                            row1 = wordDoc.Tables[obserTableIndex].Rows.Add();
+                            row2 = wordDoc.Tables[obserTableIndex].Rows.Add();
                         }
                         else
                         {
-                            wordDoc.SelectContentControlsByTitle($"{obs.Key}Obs")[1].Delete(true);
-                            wordDoc.SelectContentControlsByTitle($"{obs.Key}Act")[1].Delete(true);
-                            RemoveImage(wordDoc, $"{obs.Key}Pic");
+                            row1 = wordDoc.Tables[obserTableIndex].Rows[1];
+                            row2 = wordDoc.Tables[obserTableIndex].Rows.Add();
                         }
+                        row1.Height = 30.0f;
+                        row1.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+
+                        row2.Height = 30.0f;
+                        row2.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+
+                        row1.Borders[Word.WdBorderType.wdBorderTop].LineStyle = Word.WdLineStyle.wdLineStyleDouble;
+                        row2.Borders[Word.WdBorderType.wdBorderBottom].LineStyle = Word.WdLineStyle.wdLineStyleDouble;
+
+                        //row1
+                        row1.Cells[1].Range.Text = observations[obs.Title];
+
+                        string remark = $"Observations: {obs.Remarks}";
+                        row1.Cells[2].Range.Text = remark;
+                        row1.Cells[2].Range.Font.Bold = 0;
+                        //making Observations: as Bold
+                        object objStart = row1.Cells[2].Range.Start;
+                        object objEnd = row1.Cells[2].Range.Start + remark.IndexOf(":");
+                        Word.Range rngBold = wordDoc.Range(ref objStart, ref objEnd);
+                        rngBold.Bold = 1;
+
+                        //row2
+                        string imagePath = GetImagePath(obs.EntityRefGuid, imageHouses);
+
+                        if (!string.IsNullOrWhiteSpace(imagePath) && System.IO.File.Exists(imagePath))
+                        {
+                            row2.Height = 120.0f;
+                            row2.HeightRule = Word.WdRowHeightRule.wdRowHeightExactly;
+
+                            var area = row2.Cells[1].Range.ContentControls
+                                .Add(Word.WdContentControlType.wdContentControlPicture).Range
+                                .InlineShapes.AddPicture(imagePath);
+                        }
+
+                        string actionTaken = $"Action Taken: {obs.ActionTaken}";
+                        row2.Cells[2].Range.Text = actionTaken;
+                        row2.Cells[2].Range.Font.Bold = 0;
+                        //making Action Taken: as Bold
+                        object objStart1 = row2.Cells[2].Range.Start;
+                        object objEnd1 = row2.Cells[2].Range.Start + actionTaken.IndexOf(":");
+                        Word.Range rngBold1 = wordDoc.Range(ref objStart1, ref objEnd1);
+                        rngBold1.Bold = 1;
+                        iteration++;
                     }
+                }
+                else
+                {
+                    wordDoc.SelectContentControlsByTitle("ObsHead")[1].Delete(true);
+                    if(obserTableIndex>0)
+                        wordDoc.Tables[obserTableIndex].Delete();
                 }
 
                 //Ack //misc
@@ -495,14 +538,22 @@ namespace DocumentGenerate
                 if (custSignature != null)
                     InsertOrRemoveImage(wordDoc, "cust_sign", custSignature.EntityRefGuid, imageHouses);
 
-
-
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
 
+        private string GetImagePath(Guid entityRefId, List<ImageHouse> imageHouses)
+        {
+            var img = imageHouses.Where(w => w.EntityRefGuid == entityRefId).FirstOrDefault();
+            if (img != null)
+            {
+                var ext = img.Entity == "signature" ? "png" : "jpeg";
+                return $"{AppSettings.ImageUploadPath}{img.ImageFileGuid}.{ext}";
+            }
+            return string.Empty;
         }
 
         private void InsertOrRemoveImage(Word.Document wordDoc, string title,Guid entityRefId, List<ImageHouse> imageHouses)
