@@ -53,6 +53,7 @@ namespace DocumentGenerate
                 if (File.Exists(filename))
                 {
                     Thread.Sleep(50000);
+                    _logger.Info("Deleting File");
                     Directory.Delete(Path.GetDirectoryName(filename), true);
                 }
             }

@@ -222,89 +222,31 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle("Cea_CustomerReference")[1].Range.Text = GetValueOrSpace(cus.CustomerReference);
                     wordDoc.SelectContentControlsByTitle("Cea_RunningHours")[1].Range.Text = cus.RunningHours.ToString();
 
-                    var controllerMapping = new Dictionary<string, string> {
-                        { "bcc", "BCC" },
-                        { "2_touch", "2 Touch" },
-                        { "dsc", "DSC" },
-                        { "star_delta", "Star Delta" }
-                    };
-                    if(controllerMapping.TryGetValue(cus.Controller, out string controller))
+                    if(KeyValue.controllerMapping.TryGetValue(cus.Controller, out string controller))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_Controller", controller);
-
-                    var hmiModelMapping = new Dictionary<string, string> {
-                        { "t_150", "T 150" },
-                        { "ta_150", "TA 150" },
-                        { "t15_br", "T15 BR" },
-                        { "t7_a", "T7 A" },
-                        { "bcc", "BCC" },
-                    };
-                    if (hmiModelMapping.TryGetValue(cus.HmiModel, out string hmiModel))
+                    
+                    if (KeyValue.hmiModelMapping.TryGetValue(cus.HmiModel, out string hmiModel))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_HmiModel", hmiModel);
 
-                    var HmiSwVersionMapping = new Dictionary<string, string> {
-                        { "V2_02_05", "V2.02.05" },
-                        { "V2_07_03", "V2.07.03" },
-                        { "V2_08_06", "V2.08.06" },
-                        { "V2_08_07", "V2.08.07" },
-                        { "V1_00_07", "V1.00.07" },
-                        { "V2_08_08", "V2.08.08" }
-                    };
-                    if (HmiSwVersionMapping.TryGetValue(cus.HmiSwVersion, out string hmiSwVersion))
+                    if (KeyValue.HmiSwVersionMapping.TryGetValue(cus.HmiSwVersion, out string hmiSwVersion))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_HmiSwVersion", hmiSwVersion);
 
-                    var CpuModelMapping = new Dictionary<string, string> {
-                        { "cp_1484", "CP 1484" },
-                        { "cp_1484_1", "CP 1484-1" },
-                        { "cp_1584", "CP 1584" },
-                    };
-                    if (CpuModelMapping.TryGetValue(cus.CpuModel, out string CpuModel))
+                    if (KeyValue.CpuModelMapping.TryGetValue(cus.CpuModel, out string CpuModel))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_CpuModel", CpuModel);
 
-                    var CpuSwVersionMapping = new Dictionary<string, string> {
-                        { "V2_07_02", "V2_07_02" },
-                        { "V2_05_13", "V2_05_13" },
-                        { "V2_06_05", "V2_06_05" },
-                        { "V2.06.05", "V2.06.05" },
-                        { "V2.03.105", "V2.03.105" },
-                        { "V2.05.08", "V2.05.08" },
-                    };
-                    if (CpuSwVersionMapping.TryGetValue(cus.CpuSwVersion, out string CpuSwVersion))
+                    if (KeyValue.CpuSwVersionMapping.TryGetValue(cus.CpuSwVersion, out string CpuSwVersion))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_CpuSwVersion", CpuSwVersion);
 
-
                     //Activity
-                    var ScopeOfWrokMapping = new Dictionary<string, string> {
-                        { "annual_service", "Annual Service" },
-                        { "half_yearly_service", "Half Yearly Service" },
-                        { "condition_audit", "Condition Audit" },
-                        { "troubleshooting", "TroubleShooting" },
-                        { "repairs", "Repairs" },
-                        { "upgrade", "Upgrade" },
-                        { "control_panel_inspection", "Control Panel Inspection" },
-                        { "software_upgrade", "Software Upgrade" },
-                        {"others","Others" }
-                    };
-                    if (ScopeOfWrokMapping.TryGetValue(cus.ScopeOfWrok, out string ScopeOfWrok))
+                    if (KeyValue.ScopeOfWrokMapping.TryGetValue(cus.ScopeOfWrok, out string ScopeOfWrok))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_ScopeOfWrok", ScopeOfWrok);
                     wordDoc.SelectContentControlsByTitle("Cea_ScoperOfWorkOthers")[1].Range.Text = GetValueOrSpace(cus.ScoperOfWorkOthers);
 
-
-                    var WorkStatusMapping = new Dictionary<string, string> {
-                        { "completed", "Completed" },
-                        { "incomplete", "In Complete" }
-                    };
-                    if (WorkStatusMapping.TryGetValue(cus.WorkStatus, out string WorkStatus))
+                    if (KeyValue.WorkStatusMapping.TryGetValue(cus.WorkStatus, out string WorkStatus))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_WorkStatus", WorkStatus);
 
-                    var DecanterStatusMapping = new Dictionary<string, string> {
-                        { "in_operation", "In Operation" },
-                        { "standby", "Stand By" },
-                        { "breakdown", "Breakdown" }
-                    };
-                    if (DecanterStatusMapping.TryGetValue(cus.DecanterStatus, out string DecanterStatus))
+                    if (KeyValue.DecanterStatusMapping.TryGetValue(cus.DecanterStatus, out string DecanterStatus))
                         SelectValueFromDropDownSrc(wordDoc, "Cea_DecanterStatus", DecanterStatus);
-
-
                 }
 
                 //Vibration Analysis Report
@@ -316,28 +258,10 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle($"Vah_AsDryRun")[1].Checked = vibAna.AsDryRun;
                     wordDoc.SelectContentControlsByTitle($"Vah_AsWaterTest")[1].Checked = vibAna.AsWaterTest;
                     wordDoc.SelectContentControlsByTitle($"Vah_AsProduction")[1].Checked = vibAna.AsProduction;
-
-                    var parameterUnits = new Dictionary<string, string>() {
-                        { "SludFeed", "Sludge Feed~m3/hr" },
-                        { "Polymer", "Polymer Feed~lph" },
-
-                        { "Oper_Diff", "Operational Data~Diff: rpm" },
-                        { "Oper_Bowl", "Operational Data~Bowl rpm" },
-                        { "Oper_Tor", "Operational Data~Torque (NM)" },
-
-                        { "Bt_Md", "Bearing Temp(Deg C)~Temp: MD" },
-                        { "Bt_Bd", "Bearing Temp(Deg C)~Temp: BD" },
-
-                        { "Vm_Main_Min", "Measurements(mm/sec) Main Drive~Min" },
-                        { "Vm_Main_Max", "Measurements(mm/sec) Main Drive~Max" },
-                        { "Vm_Back_Min", "Measurements(mm/sec) Back Drive~Min" },
-                        { "Vm_Back_Max", "Measurements(mm/sec) Back Drive~Max" },
-
-                    };
-
+                   
                     if (vibAna.VibrationAnalysis != null && vibAna.VibrationAnalysis.Count > 0)
                     {
-                        foreach (var pu in parameterUnits)
+                        foreach (var pu in KeyValue.parameterUnits)
                         {
                             var param = vibAna.VibrationAnalysis?.Where(w => $"{w.Parameter}~{w.Units}" == pu.Value).FirstOrDefault();
                             if (param != null)
@@ -376,8 +300,12 @@ namespace DocumentGenerate
                         wordDoc.SelectContentControlsByTitle("Vah_Remarks")[1].Range.Font.Color = Word.WdColor.wdColorRed;
                     }
                 }
+                
+                bool pageBreakedRecomm = false;
+                bool pageBreakedObs = false;
+                
 
-                //Recommendations
+                #region Recommendations
                 var recommTableIndex = 0;
 
                 for (int i = 1; i <= wordDoc.Tables.Count; i++)
@@ -388,6 +316,8 @@ namespace DocumentGenerate
                     }
                 if (recommTableIndex > 0 && reportDocData.Recommendations != null && reportDocData.Recommendations.Count > 0)
                 {
+                    wordDoc.Tables[recommTableIndex].Range.InsertBreak();
+                    pageBreakedRecomm = true;
                     int sno = 1;
                     foreach (var recomm in reportDocData.Recommendations)
                     {
@@ -415,31 +345,12 @@ namespace DocumentGenerate
                 else
                 {
                     wordDoc.SelectContentControlsByTitle("RecommHead")[1].Delete(true);
-                    if(recommTableIndex>0)
+                    if (recommTableIndex > 0)
                         wordDoc.Tables[recommTableIndex].Delete();
-                }
+                } 
+                #endregion
 
-                //Observations
-
-                var observations = new Dictionary<string, string> {
-                    { "DecanterOutlook_FrameParts_","Decanter Outlook (Frame Parts)"},
-                    { "VibrationDampers","Vibration Dampers"},
-                    { "Flexibleconnections","Flexible connections"},
-                    { "MainDrive_BackDriveMotor","Main Drive/Back Drive Motor"},
-                    { "SlideGateInspection","Slide Gate Inspection"},
-                    { "GearBoxInspection","Gear Box Inspection"},
-                    { "DecanterFrameBed_Baffle","Decanter Frame Bed / Baffle"},
-                    { "SmallEndHub","Small End Hub"},
-                    { "LargeEndHub","Large End Hub"},
-                    { "Conveyor_Feedzonewearliner","Conveyor - Feed zone wear liner"},
-                    { "Conveyor_Flight_Tiles","Conveyor - Flight / Tiles"},
-                    { "Feedtube_ProtectingTube","Feed tube / Protecting Tube"},
-                    { "Conditionofwearstrips_Bowl_","Condition of wear strips (Bowl)"},
-                    { "MainberingHousingseat_Large_SmallEnd","Main bering Housing seat - Large / Small End"},
-                    { "Conveyorbearingseat_Large_SmallEnd","Conveyor bearing seat - Large /Small End"},
-                    { "ConveyorAxialplay_height_gapcheck","Conveyor Axial play - height / gap check"}
-                };
-
+                #region Observations
                 var obserTableIndex = 0;
                 for (int i = 1; i <= wordDoc.Tables.Count; i++)
                     if (wordDoc.Tables[i].Title == "ObsHead")
@@ -450,10 +361,12 @@ namespace DocumentGenerate
 
                 if (obserTableIndex > 0 && reportDocData.Observations != null && reportDocData.Observations.Count > 0)
                 {
+                    wordDoc.Tables[obserTableIndex].Range.InsertBreak();
+                    pageBreakedObs = true;
                     int iteration = 0;
                     foreach (var obs in reportDocData.Observations)
                     {
-                        if (!observations.ContainsKey(obs.Title))
+                        if (!KeyValue.observation.ContainsKey(obs.Title))
                             continue;
 
                         Word.Row row1 = null;
@@ -478,7 +391,7 @@ namespace DocumentGenerate
                         row2.Borders[Word.WdBorderType.wdBorderBottom].LineStyle = Word.WdLineStyle.wdLineStyleDouble;
 
                         //row1
-                        row1.Cells[1].Range.Text = observations[obs.Title];
+                        row1.Cells[1].Range.Text = KeyValue.observation[obs.Title];
 
                         string remark = $"Observations: {obs.Remarks}";
                         row1.Cells[2].Range.Text = remark;
@@ -516,11 +429,23 @@ namespace DocumentGenerate
                 else
                 {
                     wordDoc.SelectContentControlsByTitle("ObsHead")[1].Delete(true);
-                    if(obserTableIndex>0)
+                    if (obserTableIndex > 0)
                         wordDoc.Tables[obserTableIndex].Delete();
                 }
+                #endregion
 
-                //Ack //misc
+                //Ack //misc --SignCommSection
+                var commTableIndex = 0;
+                for (int i = 1; i <= wordDoc.Tables.Count; i++)
+                    if (wordDoc.Tables[i].Title == "SignCommSection")
+                    {
+                        commTableIndex = i;
+                        break;
+                    }
+                if (pageBreakedObs == true || pageBreakedRecomm == true)
+                {
+                    wordDoc.Tables[commTableIndex].Range.InsertBreak();
+                }
                 var miscData = reportDocData.Misc;
                 if (miscData != null)
                 {
