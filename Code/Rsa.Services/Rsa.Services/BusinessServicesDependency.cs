@@ -10,6 +10,7 @@ namespace Rsa.Services
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
             services.AddTransient<IReportActivities, ReportActivities>();
+            services.AddTransient<ICommonMasterActivities, CommonMasterActivities>();
             return services;
         }
     }

@@ -15,6 +15,7 @@ namespace DocumentGenerate
         public VibrationAnalysisHeader VibrationAnalysisHeader { get; set; }
         public List<Observation> Observations { get; set; }
         public List<Recommendation> Recommendations { get; set; }
+        public List<SparePart> SpareParts { get; set; }
         public Misc Misc { get; set; }
     }
 }

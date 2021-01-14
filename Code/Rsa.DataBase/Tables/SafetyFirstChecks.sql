@@ -7,7 +7,8 @@
     [SiteSafetyContact] NVARCHAR(200) NULL, 
     [StartDate] DATETIME NOT NULL, 
     [JobOrderNumber] NVARCHAR(50) NOT NULL, 
-    [ContactNUmber] NVARCHAR(50) NULL, 
+    [ContactNUmber] NVARCHAR(50) NULL,
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
     CONSTRAINT [FK_SafetyFirstChecks_ReportHeaders] FOREIGN KEY ([ReportHeaderId]) REFERENCES [ReportHeaders]([Id])
 )
 

@@ -23,7 +23,9 @@ namespace DocumentGenerate
         public DbSet<VibrationAnalysis> VibrationAnalysis { get; set; }
         public DbSet<Observation> Observations { get; set; }
         public DbSet<Recommendation> Recommendations { get; set; }
+        public DbSet<SparePart> SpareParts { get; set; }
         public DbSet<ImageHouse> ImageHouses { get; set; }
         public DbSet<Misc> Miscs { get; set; }
+        public DbSet<CommonMaster> CommonMasters { get; set; }
     }
 }

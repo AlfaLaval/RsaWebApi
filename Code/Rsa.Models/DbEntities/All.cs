@@ -51,6 +51,7 @@ namespace Rsa.Models.DbEntities
         public bool IsDocTrigger { get; set; }
 		public int? ApprovedBy { get; set; }
         public string DocTriggerFrom { get; set; } //FINAL // DRAFT
+		public Guid ReportGuid { get; set; }
 	}
 
 	public class SafetyFirstCheck
@@ -76,7 +77,8 @@ namespace Rsa.Models.DbEntities
 		[Required]
 		[MaxLength(50)]
 		public string ContactNumber { get; set; }
-        public IList<SafetyFirstCheckDetail> SafetyFirstCheckDetails { get; set; }
+		public Guid ReportGuid { get; set; }
+		public IList<SafetyFirstCheckDetail> SafetyFirstCheckDetails { get; set; }
     }
 
 	public class SafetyFirstCheckDetail
@@ -89,6 +91,7 @@ namespace Rsa.Models.DbEntities
 		public bool IsSelected { get; set; }
 		public string Remarks { get; set; }
 		public int SafetyFirstCheckId { get; set; }
+		public Guid ReportGuid { get; set; }
 
 		[ForeignKey("SafetyFirstCheckId")]
 		public SafetyFirstCheck SafetyFirstCheck { get; set; }
@@ -111,6 +114,9 @@ namespace Rsa.Models.DbEntities
 		[Required]
 		[MaxLength(50)]
 		public string ReportNumber { get; set; }
+		[Required]
+		[MaxLength(100)]
+		public string ReportType { get; set; }
 		public DateTime PreviousServiceDate { get; set; }
 		public DateTime CurrentServiceDate { get; set; }
 		public DateTime ReportDate { get; set; }
@@ -161,7 +167,8 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(50)]
 		public string DecanterStatus { get; set; }
 		public int ReportHeaderId { get; set; }
-	}
+        public Guid ReportGuid { get; set; }
+    }
 
 	public class VibrationAnalysisHeader
 	{
@@ -186,6 +193,7 @@ namespace Rsa.Models.DbEntities
 		public string BdDriveEndBack { get; set; }
 		public string BdNonDriveEndMain { get; set; }
 		public string BdNonDriveEndBack { get; set; }
+		public Guid ReportGuid { get; set; }
 		public IList<VibrationAnalysis> VibrationAnalysis { get; set; }
     }
 
@@ -215,6 +223,7 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(50)]
 		public string AsProduction { get; set; }
 		public int VibrationAnalysisHeaderId { get; set; }
+		public Guid ReportGuid { get; set; }
 
 	}
 
@@ -230,6 +239,26 @@ namespace Rsa.Models.DbEntities
 		public int ReportHeaderId { get; set; }
         public Guid EntityRefGuid { get; set; }
 		public char Status { get; set; }
+		public Guid ReportGuid { get; set; }
+	}
+
+	public class SparePart
+	{
+		public int Id { get; set; }
+
+		[MaxLength(100)]
+		public string Description { get; set; }
+		[MaxLength(100)]
+		public string PartNo { get; set; }
+		public int Quantity { get; set; }
+		[MaxLength(5)]
+		public string Type { get; set; }
+		public int ReportHeaderId { get; set; }
+		public Guid EntityRefGuid { get; set; }
+
+		//[Column(TypeName = "char")]
+		public char Status { get; set; }
+		public Guid ReportGuid { get; set; }
 	}
 
 	public class Observation
@@ -249,7 +278,8 @@ namespace Rsa.Models.DbEntities
 		public int ReportHeaderId { get; set; }
 		public Guid EntityRefGuid { get; set; }
         public char Status { get; set; }
-    }
+		public Guid ReportGuid { get; set; }
+	}
 
 	public class ImageHouse
 	{
@@ -275,5 +305,17 @@ namespace Rsa.Models.DbEntities
 		public string CustomerName { get; set; }
         public DateTime FirmDate { get; set; }
 		public DateTime CustomerDate { get; set; }
+		public Guid ReportGuid { get; set; }
+	}
+
+	public class CommonMaster
+    {
+		[Key]
+		public int Id { get; set; }
+		public string DisplayText { get; set; }
+		public string DisplayValue { get; set; }
+		[MaxLength(50)]
+		public string Type { get; set; }
+		public bool Active { get; set; }
 	}
 }

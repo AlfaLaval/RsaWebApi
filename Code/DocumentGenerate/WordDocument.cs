@@ -222,20 +222,26 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle("Cea_CustomerReference")[1].Range.Text = GetValueOrSpace(cus.CustomerReference);
                     wordDoc.SelectContentControlsByTitle("Cea_RunningHours")[1].Range.Text = cus.RunningHours.ToString();
 
-                    if(KeyValue.controllerMapping.TryGetValue(cus.Controller, out string controller))
-                        SelectValueFromDropDownSrc(wordDoc, "Cea_Controller", controller);
-                    
-                    if (KeyValue.hmiModelMapping.TryGetValue(cus.HmiModel, out string hmiModel))
-                        SelectValueFromDropDownSrc(wordDoc, "Cea_HmiModel", hmiModel);
+                    wordDoc.SelectContentControlsByTitle("Cea_Controller")[1].Range.Text = GetValueOrSpace(cus.Controller);
+                    wordDoc.SelectContentControlsByTitle("Cea_HmiModel")[1].Range.Text = GetValueOrSpace(cus.HmiModel);
+                    wordDoc.SelectContentControlsByTitle("Cea_HmiSwVersion")[1].Range.Text = GetValueOrSpace(cus.HmiSwVersion);
+                    wordDoc.SelectContentControlsByTitle("Cea_CpuModel")[1].Range.Text = GetValueOrSpace(cus.CpuModel);
+                    wordDoc.SelectContentControlsByTitle("Cea_CpuSwVersion")[1].Range.Text = GetValueOrSpace(cus.CpuSwVersion);
 
-                    if (KeyValue.HmiSwVersionMapping.TryGetValue(cus.HmiSwVersion, out string hmiSwVersion))
-                        SelectValueFromDropDownSrc(wordDoc, "Cea_HmiSwVersion", hmiSwVersion);
+                    //if(KeyValue.controllerMapping.TryGetValue(cus.Controller, out string controller))
+                    //    SelectValueFromDropDownSrc(wordDoc, "Cea_Controller", controller);
 
-                    if (KeyValue.CpuModelMapping.TryGetValue(cus.CpuModel, out string CpuModel))
-                        SelectValueFromDropDownSrc(wordDoc, "Cea_CpuModel", CpuModel);
+                    //if (KeyValue.hmiModelMapping.TryGetValue(cus.HmiModel, out string hmiModel))
+                    //    SelectValueFromDropDownSrc(wordDoc, "Cea_HmiModel", hmiModel);
 
-                    if (KeyValue.CpuSwVersionMapping.TryGetValue(cus.CpuSwVersion, out string CpuSwVersion))
-                        SelectValueFromDropDownSrc(wordDoc, "Cea_CpuSwVersion", CpuSwVersion);
+                    //if (KeyValue.HmiSwVersionMapping.TryGetValue(cus.HmiSwVersion, out string hmiSwVersion))
+                    //    SelectValueFromDropDownSrc(wordDoc, "Cea_HmiSwVersion", hmiSwVersion);
+
+                    //if (KeyValue.CpuModelMapping.TryGetValue(cus.CpuModel, out string CpuModel))
+                    //    SelectValueFromDropDownSrc(wordDoc, "Cea_CpuModel", CpuModel);
+
+                    //if (KeyValue.CpuSwVersionMapping.TryGetValue(cus.CpuSwVersion, out string CpuSwVersion))
+                    //    SelectValueFromDropDownSrc(wordDoc, "Cea_CpuSwVersion", CpuSwVersion);
 
                     //Activity
                     if (KeyValue.ScopeOfWrokMapping.TryGetValue(cus.ScopeOfWrok, out string ScopeOfWrok))
@@ -303,7 +309,8 @@ namespace DocumentGenerate
                 
                 bool pageBreakedRecomm = false;
                 bool pageBreakedObs = false;
-                
+                bool pageBreakedSpareParts = false;
+
 
                 #region Recommendations
                 var recommTableIndex = 0;
@@ -359,15 +366,18 @@ namespace DocumentGenerate
                         break;
                     }
 
-                if (obserTableIndex > 0 && reportDocData.Observations != null && reportDocData.Observations.Count > 0)
+                if (obserTableIndex > 0 && reportDocData.Observations != null 
+                    && reportDocData.Observations.Count > 0)
                 {
-                    wordDoc.Tables[obserTableIndex].Range.InsertBreak();
+                    if(pageBreakedRecomm)
+                        wordDoc.Tables[obserTableIndex].Range.InsertBreak();
+
                     pageBreakedObs = true;
                     int iteration = 0;
                     foreach (var obs in reportDocData.Observations)
                     {
-                        if (!KeyValue.observation.ContainsKey(obs.Title))
-                            continue;
+                        //if (!KeyValue.observation.ContainsKey(obs.Title))
+                        //    continue;
 
                         Word.Row row1 = null;
                         Word.Row row2 = null;
@@ -391,16 +401,23 @@ namespace DocumentGenerate
                         row2.Borders[Word.WdBorderType.wdBorderBottom].LineStyle = Word.WdLineStyle.wdLineStyleDouble;
 
                         //row1
-                        row1.Cells[1].Range.Text = KeyValue.observation[obs.Title];
+                        row1.Cells[1].Range.Text = obs.Title;
 
-                        string remark = $"Observations: {obs.Remarks}";
+                        string remark = $"Observations:";
+                        if (!string.IsNullOrWhiteSpace(obs.Remarks))
+                        {
+                            remark = $"Observations:\n{obs.Remarks}";
+                        }
                         row1.Cells[2].Range.Text = remark;
                         row1.Cells[2].Range.Font.Bold = 0;
-                        //making Observations: as Bold
+                        row1.Cells[2].Range.ListFormat.ApplyBulletDefault();
+
+                        //making Observations: as Bold & removing bullet
                         object objStart = row1.Cells[2].Range.Start;
                         object objEnd = row1.Cells[2].Range.Start + remark.IndexOf(":");
                         Word.Range rngBold = wordDoc.Range(ref objStart, ref objEnd);
                         rngBold.Bold = 1;
+                        rngBold.ListFormat.RemoveNumbers();
 
                         //row2
                         string imagePath = GetImagePath(obs.EntityRefGuid, imageHouses);
@@ -414,15 +431,22 @@ namespace DocumentGenerate
                                 .Add(Word.WdContentControlType.wdContentControlPicture).Range
                                 .InlineShapes.AddPicture(imagePath);
                         }
-
-                        string actionTaken = $"Action Taken: {obs.ActionTaken}";
+                        string actionTaken = $"Action Taken:";
+                        if (!string.IsNullOrWhiteSpace(obs.ActionTaken))
+                        {
+                            actionTaken = $"Action Taken: {obs.ActionTaken}";
+                        }
+                        
                         row2.Cells[2].Range.Text = actionTaken;
                         row2.Cells[2].Range.Font.Bold = 0;
-                        //making Action Taken: as Bold
+                        row2.Cells[2].Range.ListFormat.ApplyBulletDefault();
+
+                        //making Action Taken: as Bold & removing bullet
                         object objStart1 = row2.Cells[2].Range.Start;
                         object objEnd1 = row2.Cells[2].Range.Start + actionTaken.IndexOf(":");
                         Word.Range rngBold1 = wordDoc.Range(ref objStart1, ref objEnd1);
                         rngBold1.Bold = 1;
+                        rngBold1.ListFormat.RemoveNumbers();
                         iteration++;
                     }
                 }
@@ -434,6 +458,67 @@ namespace DocumentGenerate
                 }
                 #endregion
 
+                #region Spare Parts
+                var sparePartTypes = new string[] { "USED", "RECOM" };
+                int sparePartIter = 0;
+                foreach (var sparePart in sparePartTypes)
+                {
+                    var sparePartsTableIndex = 0;
+
+                    for (int i = 1; i <= wordDoc.Tables.Count; i++)
+                        if (wordDoc.Tables[i].Title == sparePart)
+                        {
+                            sparePartsTableIndex = i;
+                            break;
+                        }
+                    if (sparePartsTableIndex > 0 && reportDocData.SpareParts != null && reportDocData.SpareParts.Count > 0)
+                    {
+                        if (sparePartIter == 0)
+                        {
+                            wordDoc.Tables[sparePartsTableIndex].Range.InsertBreak();
+                            pageBreakedSpareParts = true;
+                            sparePartIter++;
+                        }
+
+                        int sno = 1;
+                        foreach (var sp in reportDocData.SpareParts.Where(w => sparePart.Equals(w.Type, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            var row = wordDoc.Tables[sparePartsTableIndex].Rows.Add();
+                            row.Height = 25.0f; //1.0 cm
+                            row.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+                            row.Shading.BackgroundPatternColor = Word.WdColor.wdColorWhite;
+
+                            row.Cells[1].Range.Text = $"{sno}";
+                            row.Cells[1].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[1].Range.Font.Bold = 0;
+
+                            row.Cells[2].Range.Text = GetValueOrSpace(sp.Description);
+                            row.Cells[2].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[2].Range.Font.Bold = 0;
+                            row.Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+
+                            row.Cells[3].Range.Text = GetValueOrSpace(sp.PartNo);
+                            row.Cells[3].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[3].Range.Font.Bold = 0;
+                            row.Cells[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+
+                            row.Cells[4].Range.Text = sp.Quantity.ToString();
+                            row.Cells[4].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                            row.Cells[4].Range.Font.Bold = 0;
+                            row.Cells[4].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+                            sno++;
+                        }
+                    }
+                    else
+                    {
+                        wordDoc.SelectContentControlsByTitle(sparePart)[1].Delete(true);
+                        if (sparePartsTableIndex > 0)
+                            wordDoc.Tables[sparePartsTableIndex].Delete();
+                    }
+                }
+               
+                #endregion
+
                 //Ack //misc --SignCommSection
                 var commTableIndex = 0;
                 for (int i = 1; i <= wordDoc.Tables.Count; i++)
@@ -442,10 +527,9 @@ namespace DocumentGenerate
                         commTableIndex = i;
                         break;
                     }
-                if (pageBreakedObs == true || pageBreakedRecomm == true)
-                {
+                if (pageBreakedObs || pageBreakedRecomm || pageBreakedSpareParts)
                     wordDoc.Tables[commTableIndex].Range.InsertBreak();
-                }
+                
                 var miscData = reportDocData.Misc;
                 if (miscData != null)
                 {

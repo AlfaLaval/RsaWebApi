@@ -4,6 +4,7 @@
     [SafetyFirstCheckId] INT NOT NULL, 
     [CheckPointName] NVARCHAR(50) NOT NULL, 
     [IsSelected] BIT NOT NULL DEFAULT 0, 
-    [Remarks] NVARCHAR(MAX) NULL, 
+    [Remarks] NVARCHAR(MAX) NULL,
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
     CONSTRAINT [FK_SafetyCheckDetails_SafetyFirstChecks] FOREIGN KEY ([SafetyFirstCheckId]) REFERENCES [SafetyFirstChecks]([Id])
 )

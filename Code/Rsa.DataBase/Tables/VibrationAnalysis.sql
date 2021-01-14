@@ -8,6 +8,7 @@
     [AsDryRun] NVARCHAR(50) NULL, 
     [AsWaterTest] NVARCHAR(50) NULL, 
     [AsProduction] NVARCHAR(50) NULL, 
-    [VibrationAnalysisHeaderId] INT NOT NULL, 
+    [VibrationAnalysisHeaderId] INT NOT NULL,
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
     CONSTRAINT [FK_VibrationAnalysis_VibrationAnalysisHeaders] FOREIGN KEY ([VibrationAnalysisHeaderId]) REFERENCES [VibrationAnalysisHeaders]([Id])
 )

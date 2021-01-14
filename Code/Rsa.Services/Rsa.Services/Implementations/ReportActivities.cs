@@ -113,7 +113,7 @@ namespace Rsa.Services.Implementations
                     ReportHeaderId = reportHeaderId
                 };
             }
-            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status =='A').ToList();
+            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
             if (obs == null)
                 obs = new List<Observation>();
             reportAllDetailsVm.Observations = obs;
@@ -122,6 +122,11 @@ namespace Rsa.Services.Implementations
             if (recomms == null)
                 recomms = new List<Recommendation>();
             reportAllDetailsVm.Recommendations = recomms;
+
+            List<SparePart> spareParts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
+            if (spareParts == null)
+                spareParts = new List<SparePart>();
+            reportAllDetailsVm.SpareParts = spareParts;
 
             reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc() { FirmDate = DateTime.Now, CustomerDate = DateTime.Now };
 
@@ -191,7 +196,16 @@ namespace Rsa.Services.Implementations
                 if (imageHouse.Id == 0)
                     _rsaContext.Add(imageHouse);
                 else
+                {
+                    var oldImage = _rsaContext.ImageHouses.AsNoTracking().Where(w => w.Id == imageHouse.Id).FirstOrDefault();
+                    if (oldImage != null && oldImage.ImageFileGuid != null)
+                    {
+                        var filesToDelete = Directory.GetFiles($"{ImageUploadPath}", $"{oldImage.ImageFileGuid}.*");
+                        foreach (var file in filesToDelete)
+                            File.Delete(file);
+                    }
                     _rsaContext.Update(imageHouse);
+                }
                 if (await _rsaContext.SaveChangesAsync() > 0)
                 {
                     //MyImage.ResizeJPEG(filePath);
@@ -466,6 +480,14 @@ namespace Rsa.Services.Implementations
                         _rsaContext.Add(recomm);
                     else
                         _rsaContext.Update(recomm);
+                }
+                foreach (var sp in reportAllDetails.SpareParts)
+                {
+                    sp.ReportHeaderId = reportHeaderId;
+                    if (sp.Id == 0)
+                        _rsaContext.Add(sp);
+                    else
+                        _rsaContext.Update(sp);
                 }
 
 

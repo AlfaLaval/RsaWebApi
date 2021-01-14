@@ -18,5 +18,6 @@
     BdDriveEndBack NVARCHAR(MAX) NULL,
     BdNonDriveEndMain NVARCHAR(MAX) NULL,
     BdNonDriveEndBack NVARCHAR(MAX) NULL,
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
     CONSTRAINT [FK_VibrationAnalysisHeaders_ReportHeaders] FOREIGN KEY ([ReportHeaderId]) REFERENCES [ReportHeaders]([Id])
 )

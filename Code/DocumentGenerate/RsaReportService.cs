@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DocumentGenerate
 {
@@ -78,9 +76,11 @@ namespace DocumentGenerate
                 data.VibrationAnalysisHeader.VibrationAnalysis = rsaContext.VibrationAnalysis.Where(w => w.VibrationAnalysisHeaderId == data.VibrationAnalysisHeader.Id).ToList();
             }
             data.Observations = rsaContext.Observations.AsNoTracking()
-                .Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+                .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
             data.Recommendations = rsaContext.Recommendations.AsNoTracking()
-                .Where(w => w.ReportHeaderId == reportHeaderId).ToList();
+                .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
+            data.SpareParts = rsaContext.SpareParts.AsNoTracking()
+               .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
             data.Misc = rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId);
 
             return data;
