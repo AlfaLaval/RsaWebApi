@@ -24,9 +24,6 @@
     [ScoperOfWorkOthers] NVARCHAR(50) NULL, 
     [WorkStatus] NVARCHAR(50) NOT NULL, 
     [DecanterStatus] NVARCHAR(50) NOT NULL, 
-    [ReportHeaderId] INT NOT NULL,
     [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
-    [ReportType] NVARCHAR(100) NULL, 
-    CONSTRAINT [FK_CustomerEquipmentActivities_ReportHeaders] FOREIGN KEY ([ReportHeaderId]) REFERENCES [ReportHeaders]([Id]),
-
+    [ReportType] NVARCHAR(100) NULL
 )

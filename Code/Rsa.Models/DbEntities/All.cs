@@ -58,8 +58,6 @@ namespace Rsa.Models.DbEntities
 	{
 		[Key]
 		public int Id { get; set; }
-		[Required]
-		public int ReportHeaderId { get; set; }
 		
         [Required]
 		[MaxLength(200)]
@@ -166,7 +164,6 @@ namespace Rsa.Models.DbEntities
 		[Required]
 		[MaxLength(50)]
 		public string DecanterStatus { get; set; }
-		public int ReportHeaderId { get; set; }
         public Guid ReportGuid { get; set; }
     }
 
@@ -179,7 +176,6 @@ namespace Rsa.Models.DbEntities
 		public bool AsDryRun { get; set; }
 		public bool AsWaterTest { get; set; }
 		public bool AsProduction { get; set; }
-		public int ReportHeaderId { get; set; }
 		public string Remarks { get; set; }
 
         public bool MdMotor { get; set; }
@@ -236,7 +232,6 @@ namespace Rsa.Models.DbEntities
         public bool ImmediateAction { get; set; }
 		public bool MidTermAction { get; set; }
 		public bool Observation { get; set; }
-		public int ReportHeaderId { get; set; }
         public Guid EntityRefGuid { get; set; }
 		public char Status { get; set; }
 		public Guid ReportGuid { get; set; }
@@ -253,7 +248,6 @@ namespace Rsa.Models.DbEntities
 		public int Quantity { get; set; }
 		[MaxLength(5)]
 		public string Type { get; set; }
-		public int ReportHeaderId { get; set; }
 		public Guid EntityRefGuid { get; set; }
 
 		//[Column(TypeName = "char")]
@@ -275,7 +269,6 @@ namespace Rsa.Models.DbEntities
 		
 		[MaxLength(100)]
 		public string ActionTaken { get; set; }
-		public int ReportHeaderId { get; set; }
 		public Guid EntityRefGuid { get; set; }
         public char Status { get; set; }
 		public Guid ReportGuid { get; set; }
@@ -285,12 +278,12 @@ namespace Rsa.Models.DbEntities
 	{
 		[Key]
 		public int Id { get; set; }
-        public int ReportHeaderId { get; set; }
         public string Entity { get; set; }
 		//public int EntityRefId { get; set; }
 		public Guid ImageFileGuid { get; set; }
 		public string ImageLabel { get; set; }
 		public Guid EntityRefGuid { get; set; }
+		public Guid ReportGuid { get; set; }
 
 	}
 
@@ -298,7 +291,6 @@ namespace Rsa.Models.DbEntities
     {
 		[Key]
         public int Id { get; set; }
-        public int ReportHeaderId { get; set; }
         public string FirmComments { get; set; }
 		public string CustomerComments { get; set; }
         public string FirmName { get; set; }

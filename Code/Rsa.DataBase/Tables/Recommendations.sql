@@ -5,10 +5,7 @@
     [ImmediateAction] BIT NOT NULL DEFAULT 0,
     [MidTermAction] BIT NOT NULL DEFAULT 0,
     [Observation] BIT NOT NULL DEFAULT 0,
-    [ReportHeaderId] INT NOT NULL, 
     [EntityRefGuid] UNIQUEIDENTIFIER NOT NULL,
     [Status] CHAR(1) NOT NULL DEFAULT 'A',
-    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
-    CONSTRAINT [FK_Recommendations_ReportHeaders] FOREIGN KEY ([ReportHeaderId]) REFERENCES [ReportHeaders]([Id])
-
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID()
 )

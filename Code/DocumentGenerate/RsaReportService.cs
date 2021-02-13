@@ -10,14 +10,14 @@ namespace DocumentGenerate
     public class RsaReportService
     {
         private static log4net.ILog _logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        public void GenerateWord(int headerId)
+        public void GenerateWord(Guid reportHeaderGuid)
         {
             string filename = string.Empty;
             try
             {
-                _logger.Info($"{AppSettings.Environment} -- GenerateWord Started for ReportId : {headerId}");
+                _logger.Info($"{AppSettings.Environment} -- GenerateWord Started for ReportId : {reportHeaderGuid}");
                 RsaContext rsaContext = new RsaContext();
-                var reportData = GetReportData(headerId);
+                var reportData = GetReportData(reportHeaderGuid);
                 var allUsers = rsaContext.Users.AsNoTracking().ToList();
                 var userData = allUsers.FirstOrDefault(w => w.Id == reportData.ReportHeader.CreatedBy);
                 var approvedByUser = allUsers.FirstOrDefault(w => w.Id == reportData.ReportHeader.ApprovedBy);
@@ -26,7 +26,7 @@ namespace DocumentGenerate
                     //var superVisorEmailId = allUsers.FirstOrDefault(w => w.Id == userData.SuperVisorId)?.Email;
                     if (!string.IsNullOrWhiteSpace(userData.Email))
                     {
-                        var imageHouses = rsaContext.ImageHouses.AsNoTracking().Where(w => w.ReportHeaderId == headerId).ToList();
+                        var imageHouses = rsaContext.ImageHouses.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid).ToList();
                         List<ImageHouse> imageDataToProcess = new List<ImageHouse>();
                         imageDataToProcess.AddRange(imageHouses);
                         var doc = new WordDocument();
@@ -35,7 +35,7 @@ namespace DocumentGenerate
                         string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
                         string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
                         Notification.SendEmail(userData.Email, subject , messageBody, filename);
-                        UpdateDocGenerationFlag(headerId);
+                        UpdateDocGenerationFlag(reportHeaderGuid);
                         _logger.Info("Sending Email Completed");
                     }
                 }
@@ -57,39 +57,39 @@ namespace DocumentGenerate
             }
         }
 
-        private ReportAllDetailsDocVm GetReportData(int reportHeaderId)
+        private ReportAllDetailsDocVm GetReportData(Guid reportHeaderGuid)
         {
             RsaContext rsaContext = new RsaContext();
 
             ReportAllDetailsDocVm data = new ReportAllDetailsDocVm();
             data.ReportHeader = rsaContext.ReportHeaders.AsNoTracking()
-                .FirstOrDefault(f => f.Id == reportHeaderId);
+                .FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
             data.SafetyFirstCheck = rsaContext.SafetyFirstChecks.AsNoTracking()
                 .Include("SafetyFirstCheckDetails")
-                .FirstOrDefault(w => w.ReportHeaderId == reportHeaderId);
+                .FirstOrDefault(w => w.ReportGuid == reportHeaderGuid);
             data.CustomerEquipmentActivity = rsaContext.CustomerEquipmentActivities.AsNoTracking()
-                .FirstOrDefault(w => w.ReportHeaderId == reportHeaderId);
+                .FirstOrDefault(w => w.ReportGuid == reportHeaderGuid);
             data.VibrationAnalysisHeader = rsaContext.VibrationAnalysisHeaders.AsNoTracking()
-                .FirstOrDefault(f => f.ReportHeaderId == reportHeaderId);
+                .FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
             if(data.VibrationAnalysisHeader!=null)
             {
                 data.VibrationAnalysisHeader.VibrationAnalysis = rsaContext.VibrationAnalysis.Where(w => w.VibrationAnalysisHeaderId == data.VibrationAnalysisHeader.Id).ToList();
             }
             data.Observations = rsaContext.Observations.AsNoTracking()
-                .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
+                .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
             data.Recommendations = rsaContext.Recommendations.AsNoTracking()
-                .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
+                .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
             data.SpareParts = rsaContext.SpareParts.AsNoTracking()
-               .Where(w => w.ReportHeaderId == reportHeaderId ).ToList();
-            data.Misc = rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId);
+               .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
+            data.Misc = rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
 
             return data;
         }
 
-        private void UpdateDocGenerationFlag(int reportHeaderId)
+        private void UpdateDocGenerationFlag(Guid reportHeaderGuid)
         {
             var _dbContex = new RsaContext();
-            var report = _dbContex.ReportHeaders.FirstOrDefault(f => f.Id == reportHeaderId);
+            var report = _dbContex.ReportHeaders.FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
             report.IsDocTrigger = false;
             _dbContex.SaveChanges();
         }

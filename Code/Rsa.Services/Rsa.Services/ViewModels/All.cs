@@ -12,7 +12,7 @@ namespace Rsa.Services.ViewModels
     }
 
     public class ReportAllDetailsVm {
-        public int ReportHeaderId { get; set; }
+        public Guid ReportGuid { get; set; }
         public SafetyFirstCheck SafetyFirstCheck { get; set; }
         public CustomerEquipmentActivity CustomerEquipmentActivity { get; set; }
         public VibrationAnalysisHeader VibrationAnalysisHeader { get; set; }
@@ -44,7 +44,7 @@ namespace Rsa.Services.ViewModels
         public string Base64 { get; set; }
         public string Entity { get; set; }
         public Guid EntityRefGuid { get; set; }
-        public int ReportHeaderId { get; set; }
+        public Guid ReportGuid { get; set; }
         public string ImageLabel { get; set; }
 
     }

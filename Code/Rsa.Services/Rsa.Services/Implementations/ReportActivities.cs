@@ -50,7 +50,7 @@ namespace Rsa.Services.Implementations
                 _rsaContext.Add(reportHeader);
                 if (_rsaContext.SaveChanges() > 0)
                 {
-                    safetyFirstCheck.ReportHeaderId = reportHeader.Id;
+                    safetyFirstCheck.ReportGuid = reportHeader.ReportGuid;
                     _rsaContext.Add(safetyFirstCheck);
                     reportHeader.IsSafetyFirstComplete = true;
                     _rsaContext.Update(reportHeader);
@@ -62,7 +62,7 @@ namespace Rsa.Services.Implementations
                 return new ResponseData()
                 {
                     status = ResponseStatus.success,
-                    data = new { reportHeader, safetyFirstCheck },
+                    data = new { ReportHeader = reportHeader, SafetyFirstCheck = safetyFirstCheck },
                     message = "Report Created Successfully."
                 };
             }
@@ -73,13 +73,13 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetReportDetails(int reportHeaderId)
+        public async Task<ResponseData> GetReportDetails(Guid reportHeaderGuid)
         {
             ReportAllDetailsVm reportAllDetailsVm = new ReportAllDetailsVm();
-            reportAllDetailsVm.ReportHeaderId = reportHeaderId;
+            reportAllDetailsVm.ReportGuid = reportHeaderGuid;
             reportAllDetailsVm.SafetyFirstCheck = _rsaContext.SafetyFirstChecks.AsNoTracking()
                 .Include(a=>a.SafetyFirstCheckDetails)
-                .Where(w => w.ReportHeaderId == reportHeaderId).FirstOrDefault();
+                .Where(w => w.ReportGuid == reportHeaderGuid).FirstOrDefault();
 
             if (reportAllDetailsVm.SafetyFirstCheck == null)
                 return new ResponseData()
@@ -89,13 +89,13 @@ namespace Rsa.Services.Implementations
                 };
 
             reportAllDetailsVm.CustomerEquipmentActivity = _rsaContext.CustomerEquipmentActivities.AsNoTracking()
-                .Where(w => w.ReportHeaderId == reportHeaderId).FirstOrDefault();
+                .Where(w => w.ReportGuid == reportHeaderGuid).FirstOrDefault();
 
             if(reportAllDetailsVm.CustomerEquipmentActivity == null)
             {
                 reportAllDetailsVm.CustomerEquipmentActivity = new CustomerEquipmentActivity()
                 {
-                    ReportHeaderId = reportHeaderId,
+                    ReportGuid = reportHeaderGuid,
                     PreviousServiceDate = DateTime.Now,
                     CurrentServiceDate = DateTime.Now,
                     ReportDate = DateTime.Now
@@ -103,38 +103,38 @@ namespace Rsa.Services.Implementations
             }
             reportAllDetailsVm.VibrationAnalysisHeader = _rsaContext.VibrationAnalysisHeaders.AsNoTracking()
                 .Include(a => a.VibrationAnalysis)
-                .Where(w => w.ReportHeaderId == reportHeaderId)
+                .Where(w => w.ReportGuid == reportHeaderGuid)
                 .FirstOrDefault();
 
             if (reportAllDetailsVm.VibrationAnalysisHeader == null)
             {
                 reportAllDetailsVm.VibrationAnalysisHeader = new VibrationAnalysisHeader()
                 {
-                    ReportHeaderId = reportHeaderId
+                    ReportGuid = reportHeaderGuid
                 };
             }
-            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
+            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
             if (obs == null)
                 obs = new List<Observation>();
             reportAllDetailsVm.Observations = obs;
 
-            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
+            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
             if (recomms == null)
                 recomms = new List<Recommendation>();
             reportAllDetailsVm.Recommendations = recomms;
 
-            List<SparePart> spareParts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportHeaderId == reportHeaderId && w.Status == 'A').ToList();
+            List<SparePart> spareParts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
             if (spareParts == null)
                 spareParts = new List<SparePart>();
             reportAllDetailsVm.SpareParts = spareParts;
 
-            reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId) ?? new Misc() { FirmDate = DateTime.Now, CustomerDate = DateTime.Now };
+            reportAllDetailsVm.Misc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid) ?? new Misc() { FirmDate = DateTime.Now, CustomerDate = DateTime.Now };
 
-            var signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId && f.ImageLabel == StringConstants.FirmSignature);
+            var signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.FirmSignature);
             if (signFirmImage != null)
                 reportAllDetailsVm.FirmSignatureImageId = signFirmImage.Id;
 
-            var signCustImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportHeaderId == reportHeaderId && f.ImageLabel == StringConstants.CustomerSignature);
+            var signCustImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.CustomerSignature);
             if (signCustImage != null)
                 reportAllDetailsVm.CustomerSignatureImageId = signCustImage.Id;
 
@@ -149,15 +149,16 @@ namespace Rsa.Services.Implementations
         public async Task<ResponseData> GetReports()
         {
             var reports = _rsaContext.ReportHeaders.AsNoTracking()
-                .Join(_rsaContext.SafetyFirstChecks.AsNoTracking(), rh => rh.Id, sfc => sfc.ReportHeaderId,
+                .Join(_rsaContext.SafetyFirstChecks.AsNoTracking(), rh => rh.ReportGuid, sfc => sfc.ReportGuid,
                     (rh, sfc) => new { rh, sfc })
                 .Select(s => new
                 {
-                    s.rh.Id,
+                    s.rh.ReportGuid,
                     s.rh.CreatedBy,
                     s.rh.CreatedOn,
                     s.sfc.JobOrderNumber,
-                    s.sfc.ProjectName
+                    s.sfc.ProjectName,
+                    IsOffLineData = false
                 }).OrderByDescending(o=>o.CreatedOn);
 
             var data = await reports.ToListAsync();
@@ -180,7 +181,7 @@ namespace Rsa.Services.Implementations
                 imageHouse.ImageFileGuid = newGuid;
                 imageHouse.Entity = imageEntity.Entity;
                 imageHouse.ImageLabel = imageEntity.ImageLabel;
-                imageHouse.ReportHeaderId = imageEntity.ReportHeaderId;
+                imageHouse.ReportGuid = imageEntity.ReportGuid;
                 imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
                 string filePath = $"{ImageUploadPath}{newGuid}.jpeg";
                 _logger.LogInformation($"Img Saved - Called");
@@ -288,17 +289,17 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetImagesByEntityRefGuid(int reportHeaderId, string entity,Guid entityRefGuid)
+        public async Task<ResponseData> GetImagesByEntityRefGuid(Guid reportHeaderGuid, string entity,Guid entityRefGuid)
         {
             try
             {
                 _logger.LogInformation($"{nameof(GetImagesByEntityRefGuid)} - Called");
                 List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
                 var images = await _rsaContext.ImageHouses.AsNoTracking()
-                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId
+                    .Where(w => w.Entity == entity && w.ReportGuid == reportHeaderGuid
                     && w.EntityRefGuid == entityRefGuid)
                     .ToListAsync();
-                vmImageDataList = GetImages(reportHeaderId, images);
+                vmImageDataList = GetImages(reportHeaderGuid, images);
                 _logger.LogInformation($"{nameof(GetImagesByEntityRefGuid)} - completed");
                 return new ResponseData()
                 {
@@ -317,16 +318,16 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> GetImagesByImageLabels(int reportHeaderId, string entity, string[] labels)
+        public async Task<ResponseData> GetImagesByImageLabels(Guid reportHeaderGuid, string entity, string[] labels)
         {
             try
             {
                 _logger.LogInformation($"{nameof(GetImagesByImageLabels)} - Called");
                 List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
                 var images = await _rsaContext.ImageHouses.AsNoTracking()
-                    .Where(w => w.Entity == entity && w.ReportHeaderId == reportHeaderId && labels.Contains(w.ImageLabel))
+                    .Where(w => w.Entity == entity && w.ReportGuid == reportHeaderGuid && labels.Contains(w.ImageLabel))
                     .ToListAsync();
-                vmImageDataList = GetImages(reportHeaderId, images);
+                vmImageDataList = GetImages(reportHeaderGuid, images);
                 _logger.LogInformation($"{nameof(GetImagesByImageLabels)} - completed");
                 return new ResponseData()
                 {
@@ -344,7 +345,7 @@ namespace Rsa.Services.Implementations
                 };
             }
         }
-        private List<VmImageSaveEntity> GetImages(int reportHeaderId, List<ImageHouse> images)
+        private List<VmImageSaveEntity> GetImages(Guid reportHeaderGuid, List<ImageHouse> images)
         {
             List<VmImageSaveEntity> vmImageDataList = new List<VmImageSaveEntity>();
 
@@ -358,7 +359,7 @@ namespace Rsa.Services.Implementations
                         ImageLabel = img.ImageLabel,
                         Entity = img.Entity,
                         EntityRefGuid = img.EntityRefGuid,
-                        ReportHeaderId = reportHeaderId
+                        ReportGuid = reportHeaderGuid
                     });
             }
             return vmImageDataList;
@@ -384,16 +385,16 @@ namespace Rsa.Services.Implementations
         /// <summary>
         /// It can newly create or modify the existing details
         /// </summary>
-        /// <param name="reportHeaderId"></param>
+        /// <param name="reportHeaderGuid"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        public async Task<ResponseData> SaveReportOtherDetails(int reportHeaderId, ReportAllDetailsVm reportAllDetails)
+        public async Task<ResponseData> SaveReportOtherDetails(Guid reportHeaderGuid, ReportAllDetailsVm reportAllDetails)
         {
             try
             {
                 _logger.LogInformation($"{nameof(SaveReportOtherDetails)} - Called");
 
-                if (reportHeaderId != reportAllDetails.ReportHeaderId || reportAllDetails.SafetyFirstCheck.Id == 0)
+                if (reportHeaderGuid != reportAllDetails.ReportGuid || reportAllDetails.SafetyFirstCheck.Id == 0)
                     return new ResponseData()
                     {
                         status = ResponseStatus.warning,
@@ -417,25 +418,25 @@ namespace Rsa.Services.Implementations
 
 
                 if (reportAllDetails.CustomerEquipmentActivity.Id == 0 && 
-                    _rsaContext.CustomerEquipmentActivities.Any(a=>a.ReportHeaderId == reportHeaderId)) {
+                    _rsaContext.CustomerEquipmentActivities.Any(a=>a.ReportGuid == reportHeaderGuid)) {
                     return new ResponseData()
                     {
                         status = ResponseStatus.warning,
-                        message = $"Customer Equipment Activity is already exists for Report Header Id {reportHeaderId}"
+                        message = $"Customer Equipment Activity is already exists for Report Header Id {reportHeaderGuid}"
                     };
                 }
 
                 if (reportAllDetails.VibrationAnalysisHeader.Id == 0 &&
-                    _rsaContext.VibrationAnalysisHeaders.Any(a => a.ReportHeaderId == reportHeaderId))
+                    _rsaContext.VibrationAnalysisHeaders.Any(a => a.ReportGuid == reportHeaderGuid))
                 {
                     return new ResponseData()
                     {
                         status = ResponseStatus.warning,
-                        message = $"Vibration Analysis is already exists for Report Header Id {reportHeaderId}"
+                        message = $"Vibration Analysis is already exists for Report Header Id {reportHeaderGuid}"
                     };
                 }
 
-                var reportHeader = _rsaContext.ReportHeaders.Find(reportHeaderId);
+                var reportHeader = _rsaContext.ReportHeaders.FirstOrDefault(f=>f.ReportGuid == reportHeaderGuid);
                 reportHeader.UpdatedOn = DateTime.UtcNow;
                 reportHeader.IsCustomerEquipmentComplete = true;
                 reportHeader.IsVibrationAnalysisComplete = true;
@@ -447,27 +448,27 @@ namespace Rsa.Services.Implementations
 
                 if (reportAllDetails.CustomerEquipmentActivity.Id == 0)
                 {
-                    reportAllDetails.CustomerEquipmentActivity.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
                     _rsaContext.Add(reportAllDetails.CustomerEquipmentActivity);
                 }
                 else {
-                    reportAllDetails.CustomerEquipmentActivity.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
                     _rsaContext.Update(reportAllDetails.CustomerEquipmentActivity);
                 }
 
                 if (reportAllDetails.VibrationAnalysisHeader.Id == 0)
                 {
-                    reportAllDetails.VibrationAnalysisHeader.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
                     _rsaContext.Add(reportAllDetails.VibrationAnalysisHeader);
                 }
                 else {
-                    reportAllDetails.VibrationAnalysisHeader.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
                     _rsaContext.Update(reportAllDetails.VibrationAnalysisHeader);
                 }
 
                 foreach(var obs in reportAllDetails.Observations)
                 {
-                    obs.ReportHeaderId = reportHeaderId;
+                    obs.ReportGuid = reportHeaderGuid;
                     if (obs.Id == 0)
                         _rsaContext.Add(obs);
                     else
@@ -475,7 +476,7 @@ namespace Rsa.Services.Implementations
                 }
                 foreach (var recomm in reportAllDetails.Recommendations)
                 {
-                    recomm.ReportHeaderId = reportHeaderId;
+                    recomm.ReportGuid = reportHeaderGuid;
                     if (recomm.Id == 0)
                         _rsaContext.Add(recomm);
                     else
@@ -483,7 +484,7 @@ namespace Rsa.Services.Implementations
                 }
                 foreach (var sp in reportAllDetails.SpareParts)
                 {
-                    sp.ReportHeaderId = reportHeaderId;
+                    sp.ReportGuid = reportHeaderGuid;
                     if (sp.Id == 0)
                         _rsaContext.Add(sp);
                     else
@@ -493,37 +494,44 @@ namespace Rsa.Services.Implementations
 
                 if (reportAllDetails.Misc.Id == 0)
                 {
-                    reportAllDetails.Misc.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
                     //reportAllDetails.Misc.CustomerDate = DateTime.Now;
                     //reportAllDetails.Misc.FirmDate = DateTime.Now;
                     _rsaContext.Add(reportAllDetails.Misc);
                 }
                 else
                 {
-                    reportAllDetails.Misc.ReportHeaderId = reportHeaderId;
+                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
                     _rsaContext.Update(reportAllDetails.Misc);
                 }
 
                 await _rsaContext.SaveChangesAsync();
 
 
-                return new ResponseData() { status = ResponseStatus.success,data= reportHeaderId, message = "Report Saved Successfully." };
+                return new ResponseData() { status = ResponseStatus.success,data= reportHeaderGuid, message = "Report Saved Successfully." };
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{nameof(SaveReportOtherDetails)} - Error",ex);
-                return new ResponseData() { status = ResponseStatus.error, data = reportHeaderId, message = "Report Save Failed." };
+                return new ResponseData() { status = ResponseStatus.error, data = reportHeaderGuid, message = "Report Save Failed." };
             }
 
         }
 
-        public async Task<ResponseData> SendToSuperVisor(int reportHeaderId,string from)
+        public async Task<ResponseData> SendToSuperVisor(Guid reportHeaderGuid, string from)
         {
             try
             {
                 _logger.LogInformation($"{nameof(SendToSuperVisor)} - Called");
 
-                var data = _rsaContext.ReportHeaders.Find(reportHeaderId);
+                var data = _rsaContext.ReportHeaders.FirstOrDefault(f=>f.ReportGuid == reportHeaderGuid);
+                if(data == null)
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.error,
+                        message = $"Data is not available:-{reportHeaderGuid}"
+                    };
+
                 if (data.IsDocTrigger)
                 {
                     return new ResponseData()
@@ -540,7 +548,7 @@ namespace Rsa.Services.Implementations
                 return new ResponseData()
                 {
                     status = ResponseStatus.success,
-                    data = reportHeaderId
+                    data = reportHeaderGuid
                 };
             }
             catch (Exception ex)

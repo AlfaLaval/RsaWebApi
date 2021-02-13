@@ -29,7 +29,7 @@ namespace Rsa.Services.Implementations
         }
         public IAsyncEnumerable<CommonMaster> GetAll()
         {
-           return _rsaContext.CommonMasters.AsAsyncEnumerable();
+           return _rsaContext.CommonMasters.OrderBy(w=>w.Type).AsAsyncEnumerable();
         }
 
         public async Task<ResponseData> Save(CommonMaster data)

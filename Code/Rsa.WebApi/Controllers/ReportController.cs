@@ -53,14 +53,14 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> SaveReportAllOtherDetails([FromQuery]int reportHeaderId, [FromBody] ReportAllDetailsVm reportAllDetails)
+        public async Task<ActionResult> SaveReportAllOtherDetails([FromQuery]Guid reportHeaderGuid, [FromBody] ReportAllDetailsVm reportAllDetails)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var res = await _reportActivities.SaveReportOtherDetails(reportHeaderId, reportAllDetails);
+                var res = await _reportActivities.SaveReportOtherDetails(reportHeaderGuid, reportAllDetails);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -100,14 +100,14 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetReportDetails([FromQuery]int reportHeaderId)
+        public async Task<ActionResult> GetReportDetails([FromQuery]Guid reportHeaderGuid)
         {
             try
             {
-                if (!(reportHeaderId > 0))
+                if (reportHeaderGuid == null)
                     return BadRequest();
 
-                var res = await _reportActivities.GetReportDetails(reportHeaderId);
+                var res = await _reportActivities.GetReportDetails(reportHeaderGuid);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -147,12 +147,12 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetImagesByEntityRefGuid([FromQuery]int reportHeaderId, 
+        public async Task<ActionResult> GetImagesByEntityRefGuid([FromQuery]Guid reportHeaderGuid, 
             [FromQuery] string entity,[FromQuery] string enityRefGuid)
         {
             if (Guid.TryParse(enityRefGuid, out var guid))
             {
-                var result = await _reportActivities.GetImagesByEntityRefGuid(reportHeaderId, entity, guid);
+                var result = await _reportActivities.GetImagesByEntityRefGuid(reportHeaderGuid, entity, guid);
                 return Ok(result);
             }
             return BadRequest();
@@ -163,11 +163,11 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetImagesByImageLabels([FromQuery] int reportHeaderId,
+        public async Task<ActionResult> GetImagesByImageLabels([FromQuery] Guid reportHeaderGuid,
             [FromQuery] string entity, [FromQuery] string[] imageLabels)
         {
 
-            var result = await _reportActivities.GetImagesByImageLabels(reportHeaderId, entity, imageLabels);
+            var result = await _reportActivities.GetImagesByImageLabels(reportHeaderGuid, entity, imageLabels);
             return Ok(result);
         }
 
@@ -191,12 +191,12 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> SendToSuperVisor([FromQuery] int reportHeaderId,[FromQuery] string from)
+        public async Task<ActionResult> SendToSuperVisor([FromQuery] Guid reportHeaderGuid, [FromQuery] string from)
         {
-            if(!(reportHeaderId>0) || string.IsNullOrWhiteSpace(from))
+            if(string.IsNullOrWhiteSpace(from))
                 return BadRequest();
             
-            var result = await _reportActivities.SendToSuperVisor(reportHeaderId,from);
+            var result = await _reportActivities.SendToSuperVisor(reportHeaderGuid, from);
             return Ok(result);
         }
 

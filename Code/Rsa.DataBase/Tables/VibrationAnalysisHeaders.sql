@@ -6,7 +6,6 @@
     [AsDryRun] BIT NOT NULL DEFAULT 0, 
     [AsWaterTest] BIT NOT NULL DEFAULT 0, 
     [AsProduction] BIT NOT NULL DEFAULT 0, 
-    [ReportHeaderId] INT NOT NULL, 
     [Remarks] NVARCHAR(MAX) NULL, 
     [MdMotor] BIT NOT NULL DEFAULT 0, 
     [BdMotor] BIT NOT NULL DEFAULT 0, 
@@ -18,6 +17,5 @@
     BdDriveEndBack NVARCHAR(MAX) NULL,
     BdNonDriveEndMain NVARCHAR(MAX) NULL,
     BdNonDriveEndBack NVARCHAR(MAX) NULL,
-    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
-    CONSTRAINT [FK_VibrationAnalysisHeaders_ReportHeaders] FOREIGN KEY ([ReportHeaderId]) REFERENCES [ReportHeaders]([Id])
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID()
 )
