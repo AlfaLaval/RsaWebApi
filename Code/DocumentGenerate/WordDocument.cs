@@ -511,7 +511,7 @@ namespace DocumentGenerate
                     }
                     else
                     {
-                        wordDoc.SelectContentControlsByTitle(sparePart)[1].Delete(true);
+                        //wordDoc.SelectContentControlsByTitle(sparePart)[1].Delete(true);
                         if (sparePartsTableIndex > 0)
                             wordDoc.Tables[sparePartsTableIndex].Delete();
                     }

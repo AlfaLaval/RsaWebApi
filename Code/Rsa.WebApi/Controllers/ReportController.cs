@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Rsa.Services.Abstractions;
 using Rsa.Services.ViewModels;
@@ -15,10 +19,14 @@ namespace Rsa.WebApi.Controllers
     {
         private readonly ILogger _logger;
         private readonly IReportActivities _reportActivities;
-        public ReportController(ILogger<ReportController> logger,IReportActivities reportActivities)
+        private readonly string ImageUploadPath = "";
+        private IConfiguration _configuration;
+        public ReportController(ILogger<ReportController> logger, IConfiguration configuration, IReportActivities reportActivities)
         {
             _logger = logger;
             _reportActivities = reportActivities;
+            _configuration = configuration;
+            ImageUploadPath = _configuration.GetValue<string>("ImageSec:ImageUploadPath");
         }
 
         [HttpPost]
@@ -136,9 +144,9 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteImageById([FromBody]int imageHouseId)
+        public async Task<ActionResult> DeleteImageById([FromBody]Guid imageHouseGuid)
         {
-            var result = await _reportActivities.DeleteImageById(imageHouseId);
+            var result = await _reportActivities.DeleteImageById(imageHouseGuid);
             return Ok(result);
         }
 
@@ -210,6 +218,42 @@ namespace Rsa.WebApi.Controllers
         {
             var result = await _reportActivities.GetUserLoginData(username,password);
             return Ok(result);
+        }
+
+        [Route("uploadfile")]
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> Upload()
+        {
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+
+                var imageEntity = Newtonsoft.Json.JsonConvert.DeserializeObject<VmImageSaveEntity>(formCollection["imagentity"].First());
+                string filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.jpeg";
+                if ("signature".Equals(imageEntity.Entity))
+                {
+                    filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.png";
+                }
+
+                if (file.Length > 0)
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    var result = await _reportActivities.SaveImage(imageEntity);
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
 
     }

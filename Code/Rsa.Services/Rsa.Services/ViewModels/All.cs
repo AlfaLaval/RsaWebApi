@@ -20,8 +20,8 @@ namespace Rsa.Services.ViewModels
         public List<Recommendation> Recommendations { get; set; }
         public List<SparePart> SpareParts { get; set; }
         public Misc Misc { get; set; }
-        public int FirmSignatureImageId { get; set; }
-        public int CustomerSignatureImageId { get; set; }
+        public Guid FirmSignatureImageId { get; set; }
+        public Guid CustomerSignatureImageId { get; set; }
     }
 
     public class ResponseData
@@ -40,7 +40,7 @@ namespace Rsa.Services.ViewModels
 
     public class VmImageSaveEntity
     {
-        public int ImageHouseId { get; set; }
+        public Guid ImageFileGuid { get; set; }
         public string Base64 { get; set; }
         public string Entity { get; set; }
         public Guid EntityRefGuid { get; set; }

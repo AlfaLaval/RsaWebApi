@@ -36,6 +36,7 @@ namespace Rsa.Services.Implementations
             try
             {
                 _logger.LogInformation("Create Report Called");
+                var existData = _rsaContext.ReportHeaders.AsNoTracking().Where(w => w.ReportGuid == reportHeader.ReportGuid).FirstOrDefault();
 
                 reportHeader.CreatedOn = DateTime.UtcNow;
                 reportHeader.CreatedBy = reportHeader.CreatedBy;
@@ -47,7 +48,15 @@ namespace Rsa.Services.Implementations
                 reportHeader.ApprovedBy = null;
                 reportHeader.DocTriggerFrom = "DRAFT";
 
-                _rsaContext.Add(reportHeader);
+                if (existData == null)
+                {
+                    _rsaContext.Add(reportHeader);
+                }
+                else
+                {
+                    reportHeader.Id = existData.Id;
+                    _rsaContext.Update(reportHeader);
+                }
                 if (_rsaContext.SaveChanges() > 0)
                 {
                     safetyFirstCheck.ReportGuid = reportHeader.ReportGuid;
@@ -58,6 +67,7 @@ namespace Rsa.Services.Implementations
                 }
 
                 _logger.LogInformation("Create Report Completed");
+
 
                 return new ResponseData()
                 {
@@ -132,11 +142,11 @@ namespace Rsa.Services.Implementations
 
             var signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.FirmSignature);
             if (signFirmImage != null)
-                reportAllDetailsVm.FirmSignatureImageId = signFirmImage.Id;
+                reportAllDetailsVm.FirmSignatureImageId = signFirmImage.ImageFileGuid;
 
             var signCustImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.CustomerSignature);
             if (signCustImage != null)
-                reportAllDetailsVm.CustomerSignatureImageId = signCustImage.Id;
+                reportAllDetailsVm.CustomerSignatureImageId = signCustImage.ImageFileGuid;
 
             return new ResponseData()
             {
@@ -175,23 +185,21 @@ namespace Rsa.Services.Implementations
             {
                 _logger.LogInformation($"{nameof(SaveImage)} - Called");
 
-                var newGuid = Guid.NewGuid();
                 ImageHouse imageHouse = new ImageHouse();
-                imageHouse.Id = imageEntity.ImageHouseId;
-                imageHouse.ImageFileGuid = newGuid;
+                imageHouse.ImageFileGuid = imageEntity.ImageFileGuid;
                 imageHouse.Entity = imageEntity.Entity;
                 imageHouse.ImageLabel = imageEntity.ImageLabel;
                 imageHouse.ReportGuid = imageEntity.ReportGuid;
                 imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
-                string filePath = $"{ImageUploadPath}{newGuid}.jpeg";
-                _logger.LogInformation($"Img Saved - Called");
-                if ("signature".Equals(imageEntity.Entity))
-                {
-                    filePath = $"{ImageUploadPath}{newGuid}.png";
-                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
-                }
-                else
-                    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                //string filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.jpeg";
+                //_logger.LogInformation($"Img Saved - Called");
+                //if ("signature".Equals(imageEntity.Entity))
+                //{
+                //    filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.png";
+                //    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
+                //}
+                //else
+                //    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
                 
                 _logger.LogInformation($"Img Saved - Completed");
                 if (imageHouse.Id == 0)
@@ -237,19 +245,12 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        public async Task<ResponseData> DeleteImageById(int imageHouseId)
+        public async Task<ResponseData> DeleteImageById(Guid imageHouseGuid)
         {
             try
             {
                 _logger.LogInformation($"{nameof(DeleteImageById)} - Called");
-                if (imageHouseId <= 0)
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = "Image is not valid"
-                    };
-
-                var image = _rsaContext.ImageHouses.Find(imageHouseId);
+                var image = _rsaContext.ImageHouses.FirstOrDefault(f=>f.ImageFileGuid == imageHouseGuid);
 
                 if (image == null)
                     return new ResponseData()
@@ -354,7 +355,7 @@ namespace Rsa.Services.Implementations
                 vmImageDataList.Add(
                     new VmImageSaveEntity
                     {
-                        ImageHouseId = img.Id,
+                        ImageFileGuid = img.ImageFileGuid,
                         Base64 = GetBase64(img.ImageFileGuid.ToString(), img.Entity == "signature" ? "png":"jpeg"),
                         ImageLabel = img.ImageLabel,
                         Entity = img.Entity,

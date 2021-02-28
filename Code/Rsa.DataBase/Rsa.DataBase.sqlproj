@@ -71,6 +71,8 @@
     <Build Include="Tables\Recommendations.sql" />
     <Build Include="Tables\ImageHouses.sql" />
     <Build Include="Tables\Miscs.sql" />
+    <Build Include="Tables\SpareParts.sql" />
+    <Build Include="Tables\CommonMasters.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rsa.DataBase.refactorlog" />

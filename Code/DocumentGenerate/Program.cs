@@ -22,7 +22,7 @@ namespace DocumentGenerate
                     Console.WriteLine(Env + "AlfaLaval Reports -- Document Polling Started\n");
                     RsaContext _context = new RsaContext();
 
-                    var docToBeGenerate = _context.ReportHeaders.AsNoTracking().Where(w => w.IsDocTrigger).Select(s => s.Id).ToList();
+                    var docToBeGenerate = _context.ReportHeaders.AsNoTracking().Where(w => w.IsDocTrigger).Select(s => s.ReportGuid).ToList();
 
                     if (docToBeGenerate.Any())
                     {
