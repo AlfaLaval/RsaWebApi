@@ -31,17 +31,17 @@ namespace DocumentGenerate
                         { "SludFeed", "Sludge Feed~m3/hr" },
                         { "Polymer", "Polymer Feed~lph" },
 
-                        { "Oper_Diff", "Operational Data~Diff: rpm" },
-                        { "Oper_Bowl", "Operational Data~Bowl rpm" },
-                        { "Oper_Tor", "Operational Data~Torque (NM)" },
+                        { "Oper_Diff", "Differential Speed~(rpm)" },
+                        { "Oper_Bowl", "Bowl Speed~(rpm)" },
+                        { "Oper_Tor", "Torque~(kNm)" },
 
-                        { "Bt_Md", "Bearing Temp(Deg C)~Temp: MD" },
-                        { "Bt_Bd", "Bearing Temp(Deg C)~Temp: BD" },
+                        { "Bt_Md", "MD side Bearing~Temp: (Deg. C)" },
+                        { "Bt_Bd", "BD side Bearing~Temp: (Deg. C)" },
 
-                        { "Vm_Main_Min", "Measurements(mm/sec) Main Drive~Min" },
-                        { "Vm_Main_Max", "Measurements(mm/sec) Main Drive~Max" },
-                        { "Vm_Back_Min", "Measurements(mm/sec) Back Drive~Min" },
-                        { "Vm_Back_Max", "Measurements(mm/sec) Back Drive~Max" },
+                        { "Vm_Main_Min", "MD side Bearing Vibration (mm/s) -~Min" },
+                        { "Vm_Main_Max", "MD side Bearing Vibration (mm/s) -~Max" },
+                        { "Vm_Back_Min", "BD side Bearing Vibration (mm/s) -~Min" },
+                        { "Vm_Back_Max", "BD side Bearing Vibration (mm/s) -~Max" },
 
                     };
 
@@ -54,6 +54,7 @@ namespace DocumentGenerate
                         { "upgrade", "Upgrade" },
                         { "control_panel_inspection", "Control Panel Inspection" },
                         { "software_upgrade", "Software Upgrade" },
+                        { "commissioning", "Commissioning" },
                         {"others","Others" }
                     };
         public static IDictionary<string, string> CpuSwVersionMapping = new Dictionary<string, string> {

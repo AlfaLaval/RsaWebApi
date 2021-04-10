@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Rsa.Models.DbEntities;
 using Rsa.Services.Abstractions;
 using Rsa.Services.ViewModels;
 
@@ -52,6 +53,31 @@ namespace Rsa.WebApi.Controllers
                 _logger.LogError($"{nameof(RegisterSafetyFirstCheck)} - Error", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     new { data = "Error occurred, Please contact admin"});
+            }
+        }
+
+        [Consumes("application/json")]
+        [Route("syncofflinedata")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> SyncOfflineData([FromBody] OfflineWrapper ow)
+        {
+            if (!ModelState.IsValid || ow.rptHdr == null || ow.reportAllDetail == null)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var res = await _reportActivities.SyncOfflineData(ow.rptHdr, ow.reportAllDetail);
+
+                return Ok(res);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(SyncOfflineData)} - Error", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { data = "Error occurred, Please contact admin" });
             }
         }
 
@@ -144,7 +170,7 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteImageById([FromBody]Guid imageHouseGuid)
+        public async Task<ActionResult> DeleteImageById([FromQuery]Guid imageHouseGuid)
         {
             var result = await _reportActivities.DeleteImageById(imageHouseGuid);
             return Ok(result);
@@ -242,7 +268,7 @@ namespace Rsa.WebApi.Controllers
                     {
                         file.CopyTo(stream);
                     }
-                    var result = await _reportActivities.SaveImage(imageEntity);
+                    var result = await _reportActivities.SaveImage(imageEntity,true);
                     return Ok(result);
                 }
                 else

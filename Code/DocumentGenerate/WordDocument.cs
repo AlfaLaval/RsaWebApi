@@ -132,7 +132,7 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle("sfc_Customer")[1].Range.Text = GetValueOrSpace(sfc.ProjectName);
                     wordDoc.SelectContentControlsByTitle("sfc_ServiceEngineer")[1].Range.Text = GetValueOrSpace(sfc.EngineerName);
                     wordDoc.SelectContentControlsByTitle("sfc_Job_No")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
-                    wordDoc.SelectContentControlsByTitle("sfc_startdate")[1].Range.Text = sfc.StartDate.ToShortDateString();
+                    wordDoc.SelectContentControlsByTitle("sfc_startdate")[1].Range.Text = sfc.StartDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle("sfc_contactno")[1].Range.Text = GetValueOrSpace(sfc.ContactNumber);
                     wordDoc.SelectContentControlsByTitle("sfc_sitesafetycontact")[1].Range.Text = GetValueOrSpace(sfc.SiteSafetyContact);
                     var sfcDetails = sfc.SafetyFirstCheckDetails;
@@ -206,9 +206,9 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle("Cea_Customer")[1].Range.Text = GetValueOrSpace(sfc.ProjectName);
                     wordDoc.SelectContentControlsByTitle("Cea_ServiceEngineer")[1].Range.Text = GetValueOrSpace(sfc.EngineerName);
                     wordDoc.SelectContentControlsByTitle("Cea_ReportNumber")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
-                    wordDoc.SelectContentControlsByTitle("Cea_PreviousServiceDate")[1].Range.Text = cus.PreviousServiceDate.ToShortDateString();
-                    wordDoc.SelectContentControlsByTitle("Cea_CurrentServiceDate")[1].Range.Text = cus.CurrentServiceDate.ToShortDateString();
-                    wordDoc.SelectContentControlsByTitle("Cea_ReportDate")[1].Range.Text = cus.ReportDate.ToShortDateString();
+                    wordDoc.SelectContentControlsByTitle("Cea_PreviousServiceDate")[1].Range.Text = cus.PreviousServiceDate.ToString("dd/MM/yy");
+                    wordDoc.SelectContentControlsByTitle("Cea_CurrentServiceDate")[1].Range.Text = cus.CurrentServiceDate.ToString("dd/MM/yy");
+                    wordDoc.SelectContentControlsByTitle("Cea_ReportDate")[1].Range.Text = cus.ReportDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle("Cea_SiteLocation")[1].Range.Text = GetValueOrSpace(cus.SiteLocation);
 
                     var equipmentMapping = new Dictionary<string, string> { { "decanter", "Decanter" } };
@@ -536,9 +536,9 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle($"misc_firmcomm")[1].Range.Text = GetValueOrSpace(miscData.FirmComments);
                     wordDoc.SelectContentControlsByTitle($"misc_custcomm")[1].Range.Text = GetValueOrSpace(miscData.CustomerComments);
                     wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Name")[1].Range.Text = GetValueOrSpace(miscData.FirmName);
-                    wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Date")[1].Range.Text = miscData.FirmDate.ToShortDateString();
+                    wordDoc.SelectContentControlsByTitle($"Alfa_Ack_Date")[1].Range.Text = miscData.FirmDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle($"Cust_Ack_Name")[1].Range.Text = GetValueOrSpace(miscData.CustomerName);
-                    wordDoc.SelectContentControlsByTitle($"Cust_Ack_Date")[1].Range.Text = miscData.CustomerDate.ToShortDateString(); ;
+                    wordDoc.SelectContentControlsByTitle($"Cust_Ack_Date")[1].Range.Text = miscData.CustomerDate.ToString("dd/MM/yy"); ;
                 }
                 var firmSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.FirmSignature );
                 if (firmSignature != null)

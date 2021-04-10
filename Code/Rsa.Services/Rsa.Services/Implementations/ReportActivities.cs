@@ -20,6 +20,24 @@ namespace Rsa.Services.Implementations
         private readonly RsaContext _rsaContext;
         private readonly string ImageUploadPath = "";
         private IConfiguration _configuration;
+
+        public static IDictionary<int, string> parameterUnits = new Dictionary<int, string>() {
+                        { 1, "Sludge Feed~m3/hr" },
+                        { 2, "Polymer Feed~lph" },
+
+                        { 3, "Differential Speed~(rpm)" },
+                        { 4, "Bowl Speed~(rpm)" },
+                        { 5, "Torque~(kNm)" },
+
+                        { 6, "MD side Bearing~Temp: (Deg. C)" },
+                        { 7, "BD side Bearing~Temp: (Deg. C)" },
+
+                        { 8,  "MD side Bearing Vibration (mm/s) -~Min" },
+                        { 9,  "MD side Bearing Vibration (mm/s) -~Max" },
+                        { 10, "BD side Bearing Vibration (mm/s) -~Min" },
+                        { 11, "BD side Bearing Vibration (mm/s) -~Max" },
+
+                    };
         public ReportActivities(
             ILogger<ReportActivities> logger,
             IConfiguration configuration,
@@ -31,6 +49,175 @@ namespace Rsa.Services.Implementations
             _rsaContext = rsaContext;
             ImageUploadPath = _configuration.GetValue<string>("ImageSec:ImageUploadPath");
         }
+
+        public async Task<ResponseData> SyncOfflineData(ReportHeader rptHdr, ReportAllDetailsVm reportAllDetails)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(SyncOfflineData)} - Called");
+
+                var existHeaderData = _rsaContext.ReportHeaders.AsNoTracking().Where(w => w.ReportGuid == rptHdr.ReportGuid).FirstOrDefault();
+
+                rptHdr.CreatedOn = DateTime.UtcNow;
+                rptHdr.CreatedBy = rptHdr.CreatedBy;
+                rptHdr.IsSafetyFirstComplete = false;
+                rptHdr.IsCustomerEquipmentComplete = false;
+                rptHdr.IsVibrationAnalysisComplete = false;
+                rptHdr.IsObservationComplete = false;
+                rptHdr.IsRecommendationComplete = false;
+                rptHdr.ApprovedBy = null;
+                rptHdr.DocTriggerFrom = "DRAFT";
+
+                if (existHeaderData == null)
+                    _rsaContext.Add(rptHdr);
+                else
+                {
+                    rptHdr.Id = existHeaderData.Id;
+                    _rsaContext.Update(rptHdr);
+                }
+
+                #region SafetyFirstCheck
+                if (reportAllDetails.SafetyFirstCheck != null)
+                {
+                    var eixstsSafety = _rsaContext.SafetyFirstChecks.AsNoTracking().FirstOrDefault(a => a.ReportGuid == rptHdr.ReportGuid);
+                    if (eixstsSafety != null)
+                    {
+                        _rsaContext.SafetyFirstChecks.Remove(eixstsSafety);
+                        _rsaContext.SafetyFirstCheckDetails.RemoveRange(_rsaContext.SafetyFirstCheckDetails.AsNoTracking().Where(a => a.ReportGuid == rptHdr.ReportGuid));
+                    }
+
+                    reportAllDetails.SafetyFirstCheck.ReportGuid = rptHdr.ReportGuid;
+                    reportAllDetails.SafetyFirstCheck.Id = 0;
+                    foreach (var item in reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails)
+                    {
+                        item.Id = 0;
+                        item.ReportGuid = rptHdr.ReportGuid;
+                    }
+                    _rsaContext.Add(reportAllDetails.SafetyFirstCheck);
+                }
+                #endregion
+
+                #region CustomerEquipmentActivity
+                if (reportAllDetails.CustomerEquipmentActivity != null)
+                {
+                    var custEquipAct = _rsaContext.CustomerEquipmentActivities.AsNoTracking().FirstOrDefault(a => a.ReportGuid == rptHdr.ReportGuid);
+                    if (custEquipAct != null)
+                    {
+                        _rsaContext.CustomerEquipmentActivities.Remove(custEquipAct);
+                    }
+
+                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = rptHdr.ReportGuid;
+                    reportAllDetails.CustomerEquipmentActivity.Id = 0;
+                    _rsaContext.Add(reportAllDetails.CustomerEquipmentActivity);
+
+                }
+                #endregion
+
+
+                #region VibrationAnalysisHeader
+                if (reportAllDetails.VibrationAnalysisHeader != null)
+                {
+                    var existVibAna = _rsaContext.VibrationAnalysisHeaders.AsNoTracking().FirstOrDefault(a => a.ReportGuid == rptHdr.ReportGuid);
+
+                    if (existVibAna != null)
+                    {
+                        _rsaContext.VibrationAnalysisHeaders.Remove(existVibAna);
+                        var exisVibAnaDetails = _rsaContext.VibrationAnalysis.AsNoTracking().Where(a => a.ReportGuid == rptHdr.ReportGuid);
+                        if (exisVibAnaDetails.Any())
+                            _rsaContext.VibrationAnalysis.RemoveRange(exisVibAnaDetails);
+                    }
+                    reportAllDetails.VibrationAnalysisHeader.ReportGuid = rptHdr.ReportGuid;
+                    reportAllDetails.VibrationAnalysisHeader.Id = 0;
+                    foreach (var item in reportAllDetails.VibrationAnalysisHeader.VibrationAnalysis)
+                    {
+                        item.Id = 0;
+                        item.ReportGuid = rptHdr.ReportGuid;
+                    }
+                    _rsaContext.Add(reportAllDetails.VibrationAnalysisHeader);
+
+                }
+                #endregion
+
+                #region Observations
+                if (reportAllDetails.Observations != null)
+                {
+                    var existObs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportGuid == rptHdr.ReportGuid);
+                    if(existObs.Any())
+                    {
+                        _rsaContext.Observations.RemoveRange(existObs);
+                    }
+                    foreach (var obs in reportAllDetails.Observations)
+                    {
+                        obs.ReportGuid = rptHdr.ReportGuid;
+                        obs.Id = 0;
+                        _rsaContext.Add(obs);
+                    }
+                }
+                #endregion
+
+                #region Recommendations
+                if (reportAllDetails.Recommendations != null)
+                {
+                    var existRecomm = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportGuid == rptHdr.ReportGuid);
+                    if (existRecomm.Any())
+                    {
+                        _rsaContext.Recommendations.RemoveRange(existRecomm);
+                    }
+                    foreach (var recomm in reportAllDetails.Recommendations)
+                    {
+                        recomm.ReportGuid = rptHdr.ReportGuid;
+                        recomm.Id = 0;
+                        _rsaContext.Add(recomm);
+                    }
+                }
+                #endregion
+
+                #region SpareParts
+                if (reportAllDetails.SpareParts != null)
+                {
+                    var existSparts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportGuid == rptHdr.ReportGuid);
+                    if (existSparts.Any())
+                    {
+                        _rsaContext.SpareParts.RemoveRange(existSparts);
+                    }
+
+                    foreach (var sp in reportAllDetails.SpareParts)
+                    {
+                        sp.ReportGuid = rptHdr.ReportGuid;
+                        sp.Id = 0;
+                        _rsaContext.Add(sp);
+                    }
+                }
+                #endregion
+
+                if (reportAllDetails.Misc != null)
+                {
+                    var exisMisc = _rsaContext.Miscs.AsNoTracking().FirstOrDefault(w => w.ReportGuid == rptHdr.ReportGuid);
+                    if (exisMisc != null)
+                    {
+                        _rsaContext.Miscs.Remove(exisMisc);
+                    }
+                    reportAllDetails.Misc.Id = 0;
+                    reportAllDetails.Misc.ReportGuid = rptHdr.ReportGuid;
+                    reportAllDetails.Misc.CustomerDate = DateTime.Now;
+                    reportAllDetails.Misc.FirmDate = DateTime.Now;
+                    _rsaContext.Add(reportAllDetails.Misc);
+                }
+
+                if (await _rsaContext.SaveChangesAsync() > 0)
+                {
+                    return new ResponseData() { status = ResponseStatus.success, data = rptHdr.ReportGuid, message = "Report Synchronized Successfully." };
+                }
+
+                return new ResponseData() { status = ResponseStatus.warning, data = rptHdr.ReportGuid, message = "Report Synchronization Failed." };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(SyncOfflineData)} - Error", ex);
+                return new ResponseData() { status = ResponseStatus.error, data = rptHdr.ReportGuid, message = "Report Synchronization Failed." };
+            }
+        }
+
         public async Task<ResponseData> CreateReport(ReportHeader reportHeader, SafetyFirstCheck safetyFirstCheck)
         {
             try
@@ -57,30 +244,188 @@ namespace Rsa.Services.Implementations
                     reportHeader.Id = existData.Id;
                     _rsaContext.Update(reportHeader);
                 }
-                if (_rsaContext.SaveChanges() > 0)
+
+                safetyFirstCheck.ReportGuid = reportHeader.ReportGuid;
+                foreach (var item in safetyFirstCheck.SafetyFirstCheckDetails)
                 {
-                    safetyFirstCheck.ReportGuid = reportHeader.ReportGuid;
-                    _rsaContext.Add(safetyFirstCheck);
-                    reportHeader.IsSafetyFirstComplete = true;
-                    _rsaContext.Update(reportHeader);
-                    await _rsaContext.SaveChangesAsync();
+                    item.Id = 0;
+                    item.ReportGuid = reportHeader.ReportGuid;
                 }
 
-                _logger.LogInformation("Create Report Completed");
+                _rsaContext.Add(safetyFirstCheck);
+                reportHeader.IsSafetyFirstComplete = true;
 
+                if (await _rsaContext.SaveChangesAsync() > 0)
+                {
+                    _logger.LogInformation("Create Report Completed");
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.success,
+                        data = new { ReportHeader = reportHeader, SafetyFirstCheck = safetyFirstCheck },
+                        message = "Report Created Successfully."
+                    };
+                }
 
                 return new ResponseData()
                 {
-                    status = ResponseStatus.success,
+                    status = ResponseStatus.warning,
                     data = new { ReportHeader = reportHeader, SafetyFirstCheck = safetyFirstCheck },
-                    message = "Report Created Successfully."
+                    message = "Report Creation Failed."
                 };
             }
             catch (System.Exception ex)
             {
                 _logger.LogError($"{nameof(CreateReport)} - Error", ex);
-                return new ResponseData() { status = ResponseStatus.error, message = "Report Creation Failed." };
+                return new ResponseData() { status = ResponseStatus.error, message = "Report Creation Failed.Please contact admin." };
             }
+        }
+
+        /// <summary>
+        /// It can newly create or modify the existing details
+        /// </summary>
+        /// <param name="reportHeaderGuid"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<ResponseData> SaveReportOtherDetails(Guid reportHeaderGuid, ReportAllDetailsVm reportAllDetails)
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(SaveReportOtherDetails)} - Called");
+
+                if (reportHeaderGuid != reportAllDetails.ReportGuid || reportAllDetails.SafetyFirstCheck.Id == 0)
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "Call is not genuine"
+                    };
+
+                if (reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails == null ||
+                    reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails.Count != 10)
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "Data rows are not in expected range in Safety First Check"
+                    };
+
+                if (reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails.Where(w => w.Id == 0).Any())
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = "No new entry is allowed in edit mode of Safe First Check"
+                    };
+
+
+                if (reportAllDetails.CustomerEquipmentActivity.Id == 0 &&
+                    _rsaContext.CustomerEquipmentActivities.Any(a => a.ReportGuid == reportHeaderGuid))
+                {
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = $"Customer Equipment Activity is already exists for Report Header Id {reportHeaderGuid}"
+                    };
+                }
+
+                if (reportAllDetails.VibrationAnalysisHeader.Id == 0 &&
+                    _rsaContext.VibrationAnalysisHeaders.Any(a => a.ReportGuid == reportHeaderGuid))
+                {
+                    return new ResponseData()
+                    {
+                        status = ResponseStatus.warning,
+                        message = $"Vibration Analysis is already exists for Report Header Id {reportHeaderGuid}"
+                    };
+                }
+
+                var reportHeader = _rsaContext.ReportHeaders.FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
+                reportHeader.UpdatedOn = DateTime.UtcNow;
+                reportHeader.IsCustomerEquipmentComplete = true;
+                reportHeader.IsVibrationAnalysisComplete = true;
+                reportHeader.IsObservationComplete = true;
+                reportHeader.IsRecommendationComplete = true;
+
+                _rsaContext.Update(reportHeader);
+                _rsaContext.Update(reportAllDetails.SafetyFirstCheck);
+
+                if (reportAllDetails.CustomerEquipmentActivity.Id == 0)
+                {
+                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
+                    _rsaContext.Add(reportAllDetails.CustomerEquipmentActivity);
+                }
+                else
+                {
+                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
+                    _rsaContext.Update(reportAllDetails.CustomerEquipmentActivity);
+                
+                }
+
+                if (reportAllDetails.VibrationAnalysisHeader != null)
+                {
+                    foreach (var item in reportAllDetails.VibrationAnalysisHeader.VibrationAnalysis)
+                    {
+                        item.ReportGuid = reportHeaderGuid;
+                    }
+
+                    if (reportAllDetails.VibrationAnalysisHeader.Id == 0)
+                    {
+                        reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
+                        _rsaContext.Add(reportAllDetails.VibrationAnalysisHeader);
+                    }
+                    else
+                    {
+                        reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
+                        _rsaContext.Update(reportAllDetails.VibrationAnalysisHeader);
+                    }
+                }
+
+                foreach (var obs in reportAllDetails.Observations)
+                {
+                    obs.ReportGuid = reportHeaderGuid;
+                    if (obs.Id == 0)
+                        _rsaContext.Add(obs);
+                    else
+                        _rsaContext.Update(obs);
+                }
+                foreach (var recomm in reportAllDetails.Recommendations)
+                {
+                    recomm.ReportGuid = reportHeaderGuid;
+                    if (recomm.Id == 0)
+                        _rsaContext.Add(recomm);
+                    else
+                        _rsaContext.Update(recomm);
+                }
+                foreach (var sp in reportAllDetails.SpareParts)
+                {
+                    sp.ReportGuid = reportHeaderGuid;
+                    if (sp.Id == 0)
+                        _rsaContext.Add(sp);
+                    else
+                        _rsaContext.Update(sp);
+                }
+
+
+                if (reportAllDetails.Misc.Id == 0)
+                {
+                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
+                    //reportAllDetails.Misc.CustomerDate = DateTime.Now;
+                    //reportAllDetails.Misc.FirmDate = DateTime.Now;
+                    _rsaContext.Add(reportAllDetails.Misc);
+                }
+                else
+                {
+                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
+                    _rsaContext.Update(reportAllDetails.Misc);
+                }
+
+                await _rsaContext.SaveChangesAsync();
+
+
+                return new ResponseData() { status = ResponseStatus.success, data = reportHeaderGuid, message = "Report Saved Successfully." };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(SaveReportOtherDetails)} - Error", ex);
+                return new ResponseData() { status = ResponseStatus.error, data = reportHeaderGuid, message = "Report Save Failed." };
+            }
+
         }
 
         public async Task<ResponseData> GetReportDetails(Guid reportHeaderGuid)
@@ -122,6 +467,17 @@ namespace Rsa.Services.Implementations
                 {
                     ReportGuid = reportHeaderGuid
                 };
+            }
+            else
+            {
+                var orderParams = new VibrationAnalysis[parameterUnits.Count];
+                int i = 0;
+                foreach (var item in parameterUnits.OrderBy(o=>o.Key))
+                {
+                    orderParams[i] = reportAllDetailsVm.VibrationAnalysisHeader.VibrationAnalysis.First(w => item.Value.Contains($"{w.Parameter}~{w.Units}", StringComparison.OrdinalIgnoreCase));
+                    i++;
+                }
+                reportAllDetailsVm.VibrationAnalysisHeader.VibrationAnalysis = orderParams;
             }
             List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
             if (obs == null)
@@ -179,7 +535,7 @@ namespace Rsa.Services.Implementations
             };
         }
 
-        public async Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity)
+        public async Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity, bool isFromUpload = false)
         {
             try
             {
@@ -191,28 +547,38 @@ namespace Rsa.Services.Implementations
                 imageHouse.ImageLabel = imageEntity.ImageLabel;
                 imageHouse.ReportGuid = imageEntity.ReportGuid;
                 imageHouse.EntityRefGuid = imageEntity.EntityRefGuid;
-                //string filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.jpeg";
-                //_logger.LogInformation($"Img Saved - Called");
-                //if ("signature".Equals(imageEntity.Entity))
-                //{
-                //    filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.png";
-                //    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
-                //}
-                //else
-                //    File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
-                
+                var oldImage = _rsaContext.ImageHouses.AsNoTracking().Where(w => w.ImageFileGuid == imageHouse.ImageFileGuid).FirstOrDefault();
+
+                if (!isFromUpload)
+                {
+                    //if (oldImage != null && oldImage.ImageFileGuid != null)
+                    //{
+                    //    var filesToDelete = Directory.GetFiles($"{ImageUploadPath}", $"{oldImage.ImageFileGuid}.*");
+                    //    foreach (var file in filesToDelete)
+                    //        File.Delete(file);
+                    //}
+
+                    string filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.jpeg";
+                    _logger.LogInformation($"Img Saved - Called");
+                    if ("signature".Equals(imageEntity.Entity))
+                    {
+                        filePath = $"{ImageUploadPath}{imageEntity.ImageFileGuid}.png";
+                        File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/png;base64,")[1]));
+                    }
+                    else
+                        File.WriteAllBytes(filePath, Convert.FromBase64String(imageEntity.Base64.Split("data:image/jpeg;base64,")[1]));
+                }
+
                 _logger.LogInformation($"Img Saved - Completed");
-                if (imageHouse.Id == 0)
+
+                if (oldImage == null)
+                {
+                    imageHouse.Id = 0;
                     _rsaContext.Add(imageHouse);
+                }
                 else
                 {
-                    var oldImage = _rsaContext.ImageHouses.AsNoTracking().Where(w => w.Id == imageHouse.Id).FirstOrDefault();
-                    if (oldImage != null && oldImage.ImageFileGuid != null)
-                    {
-                        var filesToDelete = Directory.GetFiles($"{ImageUploadPath}", $"{oldImage.ImageFileGuid}.*");
-                        foreach (var file in filesToDelete)
-                            File.Delete(file);
-                    }
+                    imageHouse.Id = oldImage.Id;
                     _rsaContext.Update(imageHouse);
                 }
                 if (await _rsaContext.SaveChangesAsync() > 0)
@@ -222,7 +588,7 @@ namespace Rsa.Services.Implementations
                     return new ResponseData()
                     {
                         status = ResponseStatus.success,
-                        data = imageHouse.Id,
+                        data = new { Id = imageHouse.Id, ImageFileGuid = imageHouse.ImageFileGuid, Base64 = GetBase64(imageHouse.ImageFileGuid.ToString(), imageHouse.Entity == "signature" ? "png" : "jpeg") },
                         message = "Image Saved Successfully."
                     };
                 }
@@ -383,141 +749,7 @@ namespace Rsa.Services.Implementations
             }
         }
 
-        /// <summary>
-        /// It can newly create or modify the existing details
-        /// </summary>
-        /// <param name="reportHeaderGuid"></param>
-        /// <param name=""></param>
-        /// <returns></returns>
-        public async Task<ResponseData> SaveReportOtherDetails(Guid reportHeaderGuid, ReportAllDetailsVm reportAllDetails)
-        {
-            try
-            {
-                _logger.LogInformation($"{nameof(SaveReportOtherDetails)} - Called");
-
-                if (reportHeaderGuid != reportAllDetails.ReportGuid || reportAllDetails.SafetyFirstCheck.Id == 0)
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = "Call is not genuine"
-                    };
-
-                if (reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails == null ||
-                    reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails.Count != 10)
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = "Data rows are not in expected range in Safety First Check"
-                    };
-
-                if(reportAllDetails.SafetyFirstCheck.SafetyFirstCheckDetails.Where(w=>w.Id == 0).Any())
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = "No new entry is allowed in edit mode of Safe First Check"
-                    };
-
-
-                if (reportAllDetails.CustomerEquipmentActivity.Id == 0 && 
-                    _rsaContext.CustomerEquipmentActivities.Any(a=>a.ReportGuid == reportHeaderGuid)) {
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = $"Customer Equipment Activity is already exists for Report Header Id {reportHeaderGuid}"
-                    };
-                }
-
-                if (reportAllDetails.VibrationAnalysisHeader.Id == 0 &&
-                    _rsaContext.VibrationAnalysisHeaders.Any(a => a.ReportGuid == reportHeaderGuid))
-                {
-                    return new ResponseData()
-                    {
-                        status = ResponseStatus.warning,
-                        message = $"Vibration Analysis is already exists for Report Header Id {reportHeaderGuid}"
-                    };
-                }
-
-                var reportHeader = _rsaContext.ReportHeaders.FirstOrDefault(f=>f.ReportGuid == reportHeaderGuid);
-                reportHeader.UpdatedOn = DateTime.UtcNow;
-                reportHeader.IsCustomerEquipmentComplete = true;
-                reportHeader.IsVibrationAnalysisComplete = true;
-                reportHeader.IsObservationComplete = true;
-                reportHeader.IsRecommendationComplete = true;
-
-                _rsaContext.Update(reportHeader);
-                _rsaContext.Update(reportAllDetails.SafetyFirstCheck);
-
-                if (reportAllDetails.CustomerEquipmentActivity.Id == 0)
-                {
-                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
-                    _rsaContext.Add(reportAllDetails.CustomerEquipmentActivity);
-                }
-                else {
-                    reportAllDetails.CustomerEquipmentActivity.ReportGuid = reportHeaderGuid;
-                    _rsaContext.Update(reportAllDetails.CustomerEquipmentActivity);
-                }
-
-                if (reportAllDetails.VibrationAnalysisHeader.Id == 0)
-                {
-                    reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
-                    _rsaContext.Add(reportAllDetails.VibrationAnalysisHeader);
-                }
-                else {
-                    reportAllDetails.VibrationAnalysisHeader.ReportGuid = reportHeaderGuid;
-                    _rsaContext.Update(reportAllDetails.VibrationAnalysisHeader);
-                }
-
-                foreach(var obs in reportAllDetails.Observations)
-                {
-                    obs.ReportGuid = reportHeaderGuid;
-                    if (obs.Id == 0)
-                        _rsaContext.Add(obs);
-                    else
-                        _rsaContext.Update(obs);
-                }
-                foreach (var recomm in reportAllDetails.Recommendations)
-                {
-                    recomm.ReportGuid = reportHeaderGuid;
-                    if (recomm.Id == 0)
-                        _rsaContext.Add(recomm);
-                    else
-                        _rsaContext.Update(recomm);
-                }
-                foreach (var sp in reportAllDetails.SpareParts)
-                {
-                    sp.ReportGuid = reportHeaderGuid;
-                    if (sp.Id == 0)
-                        _rsaContext.Add(sp);
-                    else
-                        _rsaContext.Update(sp);
-                }
-
-
-                if (reportAllDetails.Misc.Id == 0)
-                {
-                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
-                    //reportAllDetails.Misc.CustomerDate = DateTime.Now;
-                    //reportAllDetails.Misc.FirmDate = DateTime.Now;
-                    _rsaContext.Add(reportAllDetails.Misc);
-                }
-                else
-                {
-                    reportAllDetails.Misc.ReportGuid = reportHeaderGuid;
-                    _rsaContext.Update(reportAllDetails.Misc);
-                }
-
-                await _rsaContext.SaveChangesAsync();
-
-
-                return new ResponseData() { status = ResponseStatus.success,data= reportHeaderGuid, message = "Report Saved Successfully." };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{nameof(SaveReportOtherDetails)} - Error",ex);
-                return new ResponseData() { status = ResponseStatus.error, data = reportHeaderGuid, message = "Report Save Failed." };
-            }
-
-        }
+  
 
         public async Task<ResponseData> SendToSuperVisor(Guid reportHeaderGuid, string from)
         {

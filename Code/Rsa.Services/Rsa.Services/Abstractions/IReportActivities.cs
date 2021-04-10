@@ -9,9 +9,10 @@ namespace Rsa.Services.Abstractions
     {
         Task<ResponseData> CreateReport(ReportHeader reportHeader, SafetyFirstCheck safetyFirstCheck);
         Task<ResponseData> SaveReportOtherDetails(Guid reportHeaderGuid, ReportAllDetailsVm reportAllDetails);
+        Task<ResponseData> SyncOfflineData(ReportHeader rptHdr, ReportAllDetailsVm reportAllDetails);
         Task<ResponseData> GetReports();
         Task<ResponseData> GetReportDetails(Guid reportHeaderGuid);
-        Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity);
+        Task<ResponseData> SaveImage(VmImageSaveEntity imageEntity,bool isFromUpload = false);
         Task<ResponseData> DeleteImageById(Guid imageHouseGuid);
         Task<ResponseData> GetImagesByEntityRefGuid(Guid reportHeaderGuid, string entity,Guid enityRefGuid);
         Task<ResponseData> GetImagesByImageLabels(Guid reportHeaderGuid, string entity, string[] labels);

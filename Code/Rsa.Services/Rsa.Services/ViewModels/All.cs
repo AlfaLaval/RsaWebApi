@@ -24,6 +24,12 @@ namespace Rsa.Services.ViewModels
         public Guid CustomerSignatureImageId { get; set; }
     }
 
+    public class OfflineWrapper
+    {
+        public ReportHeader rptHdr { get; set; }
+        public ReportAllDetailsVm reportAllDetail { get; set; }
+    }
+
     public class ResponseData
     {
         public ResponseStatus status { get; set; }
