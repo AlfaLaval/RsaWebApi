@@ -7,7 +7,10 @@
     [StartDate] DATETIME NOT NULL, 
     [JobOrderNumber] NVARCHAR(50) NOT NULL, 
     [ContactNUmber] NVARCHAR(50) NULL,
-    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID()
+    [ReportGuid] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(), 
+    [AdditionalComments] NVARCHAR(MAX) NULL, 
+    [Participants] NVARCHAR(MAX) NULL, 
+    [SignDate] DATETIME NULL
 )
 
 	

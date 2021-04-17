@@ -135,6 +135,36 @@ namespace DocumentGenerate
                     wordDoc.SelectContentControlsByTitle("sfc_startdate")[1].Range.Text = sfc.StartDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle("sfc_contactno")[1].Range.Text = GetValueOrSpace(sfc.ContactNumber);
                     wordDoc.SelectContentControlsByTitle("sfc_sitesafetycontact")[1].Range.Text = GetValueOrSpace(sfc.SiteSafetyContact);
+                    wordDoc.SelectContentControlsByTitle("sfc_addcomm")[1].Range.Text = GetValueOrSpace(sfc.AdditionalComments);
+
+                    if (!string.IsNullOrWhiteSpace(sfc.Participants))
+                    {
+                        var participants = sfc.Participants.Split('\n');
+                        var firstFive = string.Empty;
+                        var secondFive = string.Empty;
+                        int midPoint = participants.Length / 2;
+                        for (int i = 0; i < participants.Length; i++)
+                        {
+                            if (i <= midPoint)
+                                firstFive += participants[i] + '\n';
+                            else
+                                secondFive += participants[i] + '\n';
+                        }
+                        if (!string.IsNullOrWhiteSpace(firstFive))
+                        {
+                            firstFive = firstFive.Remove(firstFive.LastIndexOf('\n'));
+                            wordDoc.SelectContentControlsByTitle("sfc_participants")[1].Range.Text = firstFive;
+                            wordDoc.SelectContentControlsByTitle("sfc_participants")[1].Range.ListFormat.ApplyNumberDefault();
+                        }
+                        if (!string.IsNullOrWhiteSpace(secondFive))
+                        {
+                            secondFive = secondFive.Remove(secondFive.LastIndexOf('\n'));
+                            wordDoc.SelectContentControlsByTitle("sfc_participants_1")[1].Range.Text = secondFive;
+                            wordDoc.SelectContentControlsByTitle("sfc_participants_1")[1].Range.ListFormat.ApplyNumberDefault();
+                        }
+                    }
+
+                    wordDoc.SelectContentControlsByTitle("sfc_signdate")[1].Range.Text = sfc.SignDate?.ToString("dd/MM/yy");
                     var sfcDetails = sfc.SafetyFirstCheckDetails;
                     if (sfcDetails != null)
                     {
@@ -351,9 +381,31 @@ namespace DocumentGenerate
                 }
                 else
                 {
-                    wordDoc.SelectContentControlsByTitle("RecommHead")[1].Delete(true);
-                    if (recommTableIndex > 0)
-                        wordDoc.Tables[recommTableIndex].Delete();
+                    //wordDoc.SelectContentControlsByTitle("RecommHead")[1].Delete(true);
+                    //if (recommTableIndex > 0)
+                    //    wordDoc.Tables[recommTableIndex].Delete();
+
+                    //Client Req:Recommendations can be added. But the page is getting skipped in Report
+                    var row = wordDoc.Tables[recommTableIndex].Rows.Add();
+                    row.Height = 30.0f; //1.2 cm
+                    row.HeightRule = Word.WdRowHeightRule.wdRowHeightAtLeast;
+                    row.Shading.BackgroundPatternColor = Word.WdColor.wdColorWhite;
+
+                    row.Cells[1].Range.Text = $"0{1}";
+                    row.Cells[1].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                    row.Cells[1].Range.Font.Bold = 0;
+
+                    row.Cells[2].Range.Text = string.Empty;
+                    row.Cells[2].Range.Underline = Word.WdUnderline.wdUnderlineNone;
+                    row.Cells[2].Range.Font.Bold = 0;
+                    row.Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+
+                    row.Cells[3].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = false;
+                    row.Cells[4].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = false;
+                    row.Cells[5].Range.ContentControls.Add(Word.WdContentControlType.wdContentControlCheckBox).Checked = false;
+
+                    pageBreakedRecomm = true;
+
                 } 
                 #endregion
 
@@ -366,10 +418,10 @@ namespace DocumentGenerate
                         break;
                     }
 
-                if (obserTableIndex > 0 && reportDocData.Observations != null 
+                if (obserTableIndex > 0 && reportDocData.Observations != null
                     && reportDocData.Observations.Count > 0)
                 {
-                    if(pageBreakedRecomm)
+                    if (pageBreakedRecomm)
                         wordDoc.Tables[obserTableIndex].Range.InsertBreak();
 
                     pageBreakedObs = true;
@@ -427,7 +479,7 @@ namespace DocumentGenerate
                             row2.Height = 120.0f;
                             row2.HeightRule = Word.WdRowHeightRule.wdRowHeightExactly;
 
-                            var area = row2.Cells[1].Range.ContentControls
+                            row2.Cells[1].Range.ContentControls
                                 .Add(Word.WdContentControlType.wdContentControlPicture).Range
                                 .InlineShapes.AddPicture(imagePath);
                         }
@@ -436,7 +488,7 @@ namespace DocumentGenerate
                         {
                             actionTaken = $"Action Taken: {obs.ActionTaken}";
                         }
-                        
+
                         row2.Cells[2].Range.Text = actionTaken;
                         row2.Cells[2].Range.Font.Bold = 0;
                         row2.Cells[2].Range.ListFormat.ApplyBulletDefault();
@@ -447,8 +499,21 @@ namespace DocumentGenerate
                         Word.Range rngBold1 = wordDoc.Range(ref objStart1, ref objEnd1);
                         rngBold1.Bold = 1;
                         rngBold1.ListFormat.RemoveNumbers();
+
                         iteration++;
                     }
+
+                    //Word.Row[] rows = new Word.Row[wordDoc.Tables[obserTableIndex].Rows.Count];
+                    //for (int r = 1; r <= wordDoc.Tables[obserTableIndex].Rows.Count; r = r + 2)
+                    //{
+                    //    rows[r - 1] = wordDoc.Tables[obserTableIndex].Rows[r];
+                    //    rows[r] = wordDoc.Tables[obserTableIndex].Rows[r + 1];
+                    //    //row1.Cells[1].Merge(row2.Cells[1]);
+                    //}
+                    //for (int r = 1; r <= wordDoc.Tables[obserTableIndex].Rows.Count; r = r + 2)
+                    //{
+                    //    rows[r - 1].Cells[1].Merge(rows[r].Cells[1]);
+                    //}
                 }
                 else
                 {
@@ -546,6 +611,13 @@ namespace DocumentGenerate
                 var custSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.CustomerSignature);
                 if (custSignature != null)
                     InsertOrRemoveImage(wordDoc, "cust_sign", custSignature.EntityRefGuid, imageHouses);
+
+                var sfc_firmSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.SfcFirmSignature);
+                if (sfc_firmSignature != null)
+                    InsertOrRemoveImage(wordDoc, "sfc_firmsign", sfc_firmSignature.EntityRefGuid, imageHouses);
+                var sfc_custSignature = imageHouses.FirstOrDefault(w => w.ImageLabel == StringConstants.SfcCustomerSignature);
+                if (sfc_custSignature != null)
+                    InsertOrRemoveImage(wordDoc, "sfc_customersign", sfc_custSignature.EntityRefGuid, imageHouses);
 
             }
             catch (Exception ex)

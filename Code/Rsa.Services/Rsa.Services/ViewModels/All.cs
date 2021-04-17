@@ -22,6 +22,8 @@ namespace Rsa.Services.ViewModels
         public Misc Misc { get; set; }
         public Guid FirmSignatureImageId { get; set; }
         public Guid CustomerSignatureImageId { get; set; }
+        public Guid SfcFirmSignatureImageId { get; set; }
+        public Guid SfcCustomerSignatureImageId { get; set; }
     }
 
     public class OfflineWrapper

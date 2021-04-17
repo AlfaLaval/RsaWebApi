@@ -504,6 +504,14 @@ namespace Rsa.Services.Implementations
             if (signCustImage != null)
                 reportAllDetailsVm.CustomerSignatureImageId = signCustImage.ImageFileGuid;
 
+            var sfc_signFirmImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.SfcFirmSignature);
+            if (sfc_signFirmImage != null)
+                reportAllDetailsVm.SfcFirmSignatureImageId = sfc_signFirmImage.ImageFileGuid;
+
+            var sfc_signCustImage = _rsaContext.ImageHouses.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid && f.ImageLabel == StringConstants.SfcCustomerSignature);
+            if (sfc_signCustImage != null)
+                reportAllDetailsVm.SfcCustomerSignatureImageId = sfc_signCustImage.ImageFileGuid;
+
             return new ResponseData()
             {
                 status = ResponseStatus.success,

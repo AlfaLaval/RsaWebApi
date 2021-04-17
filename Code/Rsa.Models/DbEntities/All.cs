@@ -76,6 +76,9 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(50)]
 		public string ContactNumber { get; set; }
 		public Guid ReportGuid { get; set; }
+		public string AdditionalComments { get; set; }
+		public string Participants { get; set; }
+		public DateTime? SignDate { get; set; }
 		public IList<SafetyFirstCheckDetail> SafetyFirstCheckDetails { get; set; }
     }
 

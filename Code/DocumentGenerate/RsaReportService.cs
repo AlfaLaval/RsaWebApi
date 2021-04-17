@@ -34,9 +34,10 @@ namespace DocumentGenerate
                         _logger.Info("GenerateWord Completed");
                         string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
                         string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
-                        Notification.SendEmail(userData.Email, subject , messageBody, filename);
+                        Notification.SendEmail(userData.Email, subject, messageBody, filename);
                         UpdateDocGenerationFlag(reportHeaderGuid);
                         _logger.Info("Sending Email Completed");
+
                     }
                 }
 
