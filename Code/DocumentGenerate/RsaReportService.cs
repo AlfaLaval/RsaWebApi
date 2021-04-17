@@ -32,11 +32,14 @@ namespace DocumentGenerate
                         var doc = new WordDocument();
                         filename = doc.Generate(reportData, userData.DisplayName, imageDataToProcess);
                         _logger.Info("GenerateWord Completed");
-                        string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
-                        string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
-                        Notification.SendEmail(userData.Email, subject, messageBody, filename);
-                        UpdateDocGenerationFlag(reportHeaderGuid);
-                        _logger.Info("Sending Email Completed");
+                        if (!Environment.UserInteractive)
+                        {
+                            string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
+                            string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
+                            Notification.SendEmail(userData.Email, subject, messageBody, filename);
+                            UpdateDocGenerationFlag(reportHeaderGuid);
+                            _logger.Info("Sending Email Completed");
+                        }
 
                     }
                 }
@@ -51,7 +54,8 @@ namespace DocumentGenerate
             {
                 if (File.Exists(filename))
                 {
-                    Thread.Sleep(50000);
+                    if (!Environment.UserInteractive)
+                        Thread.Sleep(50000);
                     _logger.Info("Deleting File");
                     Directory.Delete(Path.GetDirectoryName(filename), true);
                 }

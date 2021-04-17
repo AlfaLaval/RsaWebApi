@@ -503,17 +503,23 @@ namespace DocumentGenerate
                         iteration++;
                     }
 
-                    //Word.Row[] rows = new Word.Row[wordDoc.Tables[obserTableIndex].Rows.Count];
-                    //for (int r = 1; r <= wordDoc.Tables[obserTableIndex].Rows.Count; r = r + 2)
-                    //{
-                    //    rows[r - 1] = wordDoc.Tables[obserTableIndex].Rows[r];
-                    //    rows[r] = wordDoc.Tables[obserTableIndex].Rows[r + 1];
-                    //    //row1.Cells[1].Merge(row2.Cells[1]);
-                    //}
-                    //for (int r = 1; r <= wordDoc.Tables[obserTableIndex].Rows.Count; r = r + 2)
-                    //{
-                    //    rows[r - 1].Cells[1].Merge(rows[r].Cells[1]);
-                    //}
+                    #region Merging Cells
+                    Word.Table table = wordDoc.Tables[obserTableIndex];
+                    Word.Cell cell;
+                    int rowIndex = 1;
+                    int blockIndex = table.Rows.Count / 2;
+                    int coloumnIndex = 1;
+
+                    for (int blockCounter = 1; blockCounter <= blockIndex; blockCounter++)
+                    {
+                        for (int colCounter = 1; colCounter <= coloumnIndex; colCounter++)
+                        {
+                            cell = table.Cell(rowIndex, colCounter);
+                            cell.Merge(table.Cell(cell.RowIndex + 1, colCounter));
+                        }
+                        rowIndex += 2;
+                    } 
+                    #endregion
                 }
                 else
                 {
