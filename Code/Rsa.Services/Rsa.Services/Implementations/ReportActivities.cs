@@ -479,17 +479,17 @@ namespace Rsa.Services.Implementations
                 }
                 reportAllDetailsVm.VibrationAnalysisHeader.VibrationAnalysis = orderParams;
             }
-            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
+            List<Observation> obs = _rsaContext.Observations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").ToList();
             if (obs == null)
                 obs = new List<Observation>();
             reportAllDetailsVm.Observations = obs;
 
-            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
+            List<Recommendation> recomms = _rsaContext.Recommendations.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").ToList();
             if (recomms == null)
                 recomms = new List<Recommendation>();
             reportAllDetailsVm.Recommendations = recomms;
 
-            List<SparePart> spareParts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == 'A').ToList();
+            List<SparePart> spareParts = _rsaContext.SpareParts.AsNoTracking().Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").ToList();
             if (spareParts == null)
                 spareParts = new List<SparePart>();
             reportAllDetailsVm.SpareParts = spareParts;
@@ -520,20 +520,28 @@ namespace Rsa.Services.Implementations
 
         }
 
-        public async Task<ResponseData> GetReports()
+        public async Task<ResponseData> GetReports(int userId)
         {
-            var reports = _rsaContext.ReportHeaders.AsNoTracking()
+            var user = _rsaContext.Users.FirstOrDefault(w => w.Id == userId);
+
+            var reportQuery = _rsaContext.ReportHeaders.AsNoTracking()
                 .Join(_rsaContext.SafetyFirstChecks.AsNoTracking(), rh => rh.ReportGuid, sfc => sfc.ReportGuid,
-                    (rh, sfc) => new { rh, sfc })
-                .Select(s => new
-                {
-                    s.rh.ReportGuid,
-                    s.rh.CreatedBy,
-                    s.rh.CreatedOn,
-                    s.sfc.JobOrderNumber,
-                    s.sfc.ProjectName,
-                    IsOffLineData = false
-                }).OrderByDescending(o=>o.CreatedOn);
+                    (rh, sfc) => new { rh, sfc });
+
+            if (user.IsSuperUser == false)
+            {
+                reportQuery = reportQuery.Where(w => w.rh.CreatedBy == userId);
+            }
+
+            var reports = reportQuery.Select(s => new
+            {
+                s.rh.ReportGuid,
+                s.rh.CreatedBy,
+                s.rh.CreatedOn,
+                s.sfc.JobOrderNumber,
+                s.sfc.ProjectName,
+                IsOffLineData = false
+            }).OrderByDescending(o => o.CreatedOn);
 
             var data = await reports.ToListAsync();
             return new ResponseData()

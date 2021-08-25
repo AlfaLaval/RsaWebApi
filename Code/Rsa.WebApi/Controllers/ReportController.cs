@@ -64,7 +64,12 @@ namespace Rsa.WebApi.Controllers
         public async Task<ActionResult> SyncOfflineData([FromBody] OfflineWrapper ow)
         {
             if (!ModelState.IsValid || ow.rptHdr == null || ow.reportAllDetail == null)
+            {
+                _logger.LogWarning($"{nameof(SyncOfflineData)}-ModelState:{ModelState.IsValid}", ModelState.ErrorCount, Newtonsoft.Json.JsonConvert.SerializeObject(ModelState.Select(s => new { s.Key, s.Value })));
+                _logger.LogWarning($"{nameof(SyncOfflineData)}-{nameof(ow.rptHdr)}", ow.rptHdr);
+                _logger.LogWarning($"{nameof(SyncOfflineData)}-{nameof(ow.reportAllDetail)}", ow.reportAllDetail);
                 return BadRequest(ModelState);
+            }
 
             try
             {
@@ -112,11 +117,14 @@ namespace Rsa.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetReports()
+        public async Task<ActionResult> GetReports(int userId)
         {
             try
             {
-                var res = await _reportActivities.GetReports();
+                if (userId <= 0)
+                    return BadRequest();
+
+                var res = await _reportActivities.GetReports(userId);
                 return Ok(res);
             }
             catch (Exception ex)

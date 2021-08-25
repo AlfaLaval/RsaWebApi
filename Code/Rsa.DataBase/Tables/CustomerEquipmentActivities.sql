@@ -4,7 +4,7 @@
     [Country] NVARCHAR(100) NOT NULL, 
     [Customer] NVARCHAR(200) NOT NULL, 
     [ServiceEngineer] NVARCHAR(200) NOT NULL, 
-    [ReportNumber] NVARCHAR(50) NOT NULL, 
+    [ReportNumber] NVARCHAR(50) NULL, 
     [PreviousServiceDate] DATETIME NOT NULL, 
     [CurrentServiceDate] DATETIME NOT NULL, 
     [ReportDate] DATETIME NOT NULL, 

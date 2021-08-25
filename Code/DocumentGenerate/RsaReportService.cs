@@ -32,14 +32,12 @@ namespace DocumentGenerate
                         var doc = new WordDocument();
                         filename = doc.Generate(reportData, userData.DisplayName, imageDataToProcess);
                         _logger.Info("GenerateWord Completed");
-                        if (!Environment.UserInteractive)
-                        {
-                            string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
-                            string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
-                            Notification.SendEmail(userData.Email, subject, messageBody, filename);
-                            UpdateDocGenerationFlag(reportHeaderGuid);
-                            _logger.Info("Sending Email Completed");
-                        }
+                        string messageBody = $"Please find the Decanter Report document.\nProject Name:{reportData.SafetyFirstCheck.ProjectName}\nJob No:{reportData.SafetyFirstCheck.JobOrderNumber}";
+                        string subject = $"Decanter Report - {reportData.ReportHeader.DocTriggerFrom}";
+                        Notification.SendEmail(userData.Email, subject, messageBody, filename);
+                        UpdateDocGenerationFlag(reportHeaderGuid);
+                        _logger.Info("Sending Email Completed");
+
 
                     }
                 }
@@ -54,8 +52,7 @@ namespace DocumentGenerate
             {
                 if (File.Exists(filename))
                 {
-                    if (!Environment.UserInteractive)
-                        Thread.Sleep(50000);
+                    Thread.Sleep(50000);
                     _logger.Info("Deleting File");
                     Directory.Delete(Path.GetDirectoryName(filename), true);
                 }
@@ -81,11 +78,11 @@ namespace DocumentGenerate
                 data.VibrationAnalysisHeader.VibrationAnalysis = rsaContext.VibrationAnalysis.Where(w => w.VibrationAnalysisHeaderId == data.VibrationAnalysisHeader.Id).ToList();
             }
             data.Observations = rsaContext.Observations.AsNoTracking()
-                .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
+                .Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").OrderBy(o=>o.CreatedDateTime).ToList();
             data.Recommendations = rsaContext.Recommendations.AsNoTracking()
-                .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
+                .Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").ToList();
             data.SpareParts = rsaContext.SpareParts.AsNoTracking()
-               .Where(w => w.ReportGuid == reportHeaderGuid ).ToList();
+               .Where(w => w.ReportGuid == reportHeaderGuid && w.Status == "A").ToList();
             data.Misc = rsaContext.Miscs.AsNoTracking().FirstOrDefault(f => f.ReportGuid == reportHeaderGuid);
 
             return data;

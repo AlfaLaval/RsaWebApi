@@ -231,11 +231,11 @@ namespace DocumentGenerate
 
                     }
                     wordDoc.SelectContentControlsByTitle("Job_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
-                    //wordDoc.SelectContentControlsByTitle("Sub_No_Header")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
+                    wordDoc.SelectContentControlsByTitle("Sub_No_Header")[1].Range.Text = GetValueOrSpace(cus.ReportNumber);
 
                     wordDoc.SelectContentControlsByTitle("Cea_Customer")[1].Range.Text = GetValueOrSpace(sfc.ProjectName);
                     wordDoc.SelectContentControlsByTitle("Cea_ServiceEngineer")[1].Range.Text = GetValueOrSpace(sfc.EngineerName);
-                    wordDoc.SelectContentControlsByTitle("Cea_ReportNumber")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
+                    //wordDoc.SelectContentControlsByTitle("Cea_ReportNumber")[1].Range.Text = GetValueOrSpace(sfc.JobOrderNumber);
                     wordDoc.SelectContentControlsByTitle("Cea_PreviousServiceDate")[1].Range.Text = cus.PreviousServiceDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle("Cea_CurrentServiceDate")[1].Range.Text = cus.CurrentServiceDate.ToString("dd/MM/yy");
                     wordDoc.SelectContentControlsByTitle("Cea_ReportDate")[1].Range.Text = cus.ReportDate.ToString("dd/MM/yy");
@@ -486,7 +486,7 @@ namespace DocumentGenerate
                         string actionTaken = $"Action Taken:";
                         if (!string.IsNullOrWhiteSpace(obs.ActionTaken))
                         {
-                            actionTaken = $"Action Taken: {obs.ActionTaken}";
+                            actionTaken = $"Action Taken:\n{obs.ActionTaken}";
                         }
 
                         row2.Cells[2].Range.Text = actionTaken;

@@ -20,15 +20,15 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(100)]
 		public string Email { get; set; }
 		public bool Active { get; set; }
-		public bool IsSuperVisor { get; set; }
+		//public bool IsSuperVisor { get; set; }
 
-		public int? SuperVisorId { get; set; }
+		//public int? SuperVisorId { get; set; }
 
-		public string OTP { get; set; }
+		//public string OTP { get; set; }
 
-		public DateTime? OTPGeneratedOn { get; set; }
+		//public DateTime? OTPGeneratedOn { get; set; }
 
-		public string Region { get; set; }
+		//public string Region { get; set; }
 
 		public bool IsSuperUser { get; set; }
         public string Password { get; set; }
@@ -112,7 +112,7 @@ namespace Rsa.Models.DbEntities
 		[Required]
 		[MaxLength(200)]
 		public string ServiceEngineer { get; set; }
-		[Required]
+		
 		[MaxLength(50)]
 		public string ReportNumber { get; set; }
 		[Required]
@@ -230,13 +230,12 @@ namespace Rsa.Models.DbEntities
 	{
 		public int Id { get; set; }
 
-		[MaxLength(100)]
 		public string Remarks { get; set; }
         public bool ImmediateAction { get; set; }
 		public bool MidTermAction { get; set; }
 		public bool Observation { get; set; }
         public Guid EntityRefGuid { get; set; }
-		public char Status { get; set; }
+		public string Status { get; set; }
 		public Guid ReportGuid { get; set; }
 	}
 
@@ -254,7 +253,7 @@ namespace Rsa.Models.DbEntities
 		public Guid EntityRefGuid { get; set; }
 
 		//[Column(TypeName = "char")]
-		public char Status { get; set; }
+		public string Status { get; set; }
 		public Guid ReportGuid { get; set; }
 	}
 
@@ -267,14 +266,13 @@ namespace Rsa.Models.DbEntities
 		[MaxLength(100)]
 		public string Title { get; set; }
 		
-		[MaxLength(100)]
 		public string Remarks { get; set; }
 		
-		[MaxLength(100)]
 		public string ActionTaken { get; set; }
 		public Guid EntityRefGuid { get; set; }
-        public char Status { get; set; }
+        public string Status { get; set; }
 		public Guid ReportGuid { get; set; }
+		public DateTime CreatedDateTime { get; set; }
 	}
 
 	public class ImageHouse
